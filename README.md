@@ -1,5 +1,5 @@
 # Sportista - Projekat
-Na projektu rade: Saida Saric, Lejla Garic, Ibrahim Lazovic, Damir Bajrami
+Na projektu rade: Saida Saric, Lejla Garic, Ibrahim Lazovic, Damir Bajrami, Imran Djokic
 
 
 # UPUTE ZA KOLEGE
