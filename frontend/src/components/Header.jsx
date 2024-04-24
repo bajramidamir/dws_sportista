@@ -1,4 +1,6 @@
 import React from 'react';
+import Signup from './Signup';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   return (
@@ -7,9 +9,6 @@ const Header = () => {
         <div className="text-xl font-bold">Logo</div>
         <nav>
           <ul className="flex space-x-4">
-            <li>
-              <a href="#" className="hover:text-gray-300">Blank</a>
-            </li>
             <li>
               <a href="#" className="hover:text-gray-300">Blank</a>
             </li>
