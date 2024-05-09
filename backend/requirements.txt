@@ -25,7 +25,7 @@ greenlet==3.0.3
 h11==0.14.0
 httptools==0.6.1
 humanize==3.13.1
-idna==3.4
+idna==3.7
 image-go-nord==0.1.4
 initial-setup==0.3.98
 langtable==0.0.65
@@ -38,6 +38,7 @@ motor==3.3.2
 nftables==0.1
 olefile==0.46
 packaging==23.1
+passlib==1.7.4
 pexpect==4.8.0
 pid==2.2.3
 pillow==10.3.0
@@ -49,12 +50,13 @@ ptyprocess==0.7.0
 pwquality==1.4.5
 pycairo==1.25.1
 pycparser==2.20
-pycups==2.0.1
+pycups==2.0.4
 pycurl==7.45.2
 pydantic==2.6.4
 pydantic_core==2.16.3
 pyenchant==3.2.2
 PyGObject==3.46.0
+PyJWT==2.8.0
 pykickstart==3.48
 pymongo==4.6.2
 pyparted==3.13.0
@@ -70,7 +72,7 @@ python-xlib==0.33
 pyudev==0.24.1
 pyxdg==0.27
 PyYAML==6.0.1
-regex==2023.12.25
+regex==2024.4.16
 requests==2.28.2
 requests-file==1.5.1
 requests-ftp==0.3.1

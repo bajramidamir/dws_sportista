@@ -34,7 +34,7 @@ class User(Base):
     password = Column(String)
     city = Column(String)
     fitness_level = Column(Enum(FitnessLevel))
-    matches_played = Column(Integer)
+    matches_played = Column(Integer, default=0)
     role = Column(Enum(UserRole))
     preferred_sport = Column(Enum(SportsActivity))
 
@@ -44,6 +44,7 @@ class UserBase(BaseModel):
     last_name: str
     username: str
     email: str
+    password: str
     city: str
     fitness_level: FitnessLevel
     matches_played: int
@@ -59,7 +60,6 @@ class UserCreateRequest(BaseModel):
     password: str
     city: str
     fitness_level: FitnessLevel
-    matches_played: int = 0
     role: UserRole = UserRole.user
     preferred_sport: SportsActivity
 
