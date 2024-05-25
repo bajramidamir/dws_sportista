@@ -8,9 +8,6 @@ import SignupPage from './pages/SignupPage';
 import LoginPage from './pages/LoginPage';
 import ManagerReqPage from './pages/ManagerReqPage';
 
-import AdminPage from './pages/AdminPage';
-import ManagerPage from './pages/ManagerPage';
-import UserPage from './pages/UserPage';
 
 
 const router = createBrowserRouter([
@@ -25,19 +22,6 @@ const router = createBrowserRouter([
   },
   {path: '/postanimenadzer',
   element: <ManagerReqPage/>
-
-  }  /*ovdje trebamo povezati AdminPage, ManagerPage i UserPage */,
-  {
-    path: '/admin',
-    element: <AdminPage/>
-  },
-  {
-    path: '/manager',
-    element: <ManagerPage/>
-  },
-  {
-    path: '/user',
-    element: <UserPage/>
 
   }
 ])
