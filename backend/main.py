@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 import os
 import jwt
 from jwt import PyJWTError
-from typing import Optional
+from typing import Optional, List
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
 import models
@@ -47,7 +48,7 @@ def get_db():
     finally:
         db.close()
 
-# Ruta za prijavu (login)
+# Ruta za login
 @app.post("/users/login")
 async def login_for_access_token(user: models.UserLoginRequest, db: Session = Depends(get_db)):
     user = authenticate_user(db, user.username, user.password)
@@ -94,6 +95,30 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 # Ruta za validaciju pristupnog tokena
-@app.post("users/me")
+@app.post("/users/me")
 async def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
+
+# Ruta za dobavljanje najnovijih terena
+@app.get("/courts/latest", response_model=List[models.CourtWithSports])
+def get_latest_courts(db: Session = Depends(get_db)):
+    try:
+        # Query to fetch the three latest courts
+        latest_courts = db.query(models.Court).order_by(desc(models.Court.id)).limit(3).all()
+        
+        # Fetch sports names for each court
+        result = []
+        for court in latest_courts:
+            sports = db.query(models.CourtSport).filter(models.CourtSport.court_id == court.id).all()
+            sport_names = [db.query(models.Sport.name).filter(models.Sport.id == sport.sport_id).first()[0] for sport in sports]
+            result.append(models.CourtWithSports(
+                id=court.id,
+                court_type=court.court_type,
+                city=court.city,
+                name=court.name,
+                image_link=court.image_link,
+                sports=sport_names  # Corrected field to sport_names
+            ))
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
