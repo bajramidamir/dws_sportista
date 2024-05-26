@@ -17,6 +17,7 @@ const TerminiTable = () => {
   };
 
   return (
+    <div className="overflow-x-auto">
     <table className="table-auto w-full">
       <thead>
         <tr>
@@ -45,13 +46,14 @@ const TerminiTable = () => {
                 className="bg-red-500 text-white px-4 py-2 rounded"
                 onClick={() => handleRemove(termin.id)}
               >
-                Ukloni
+                Otkaži
               </button>
             </td>
           </tr>
         ))}
       </tbody>
     </table>
+  </div>
   );
 };
 
