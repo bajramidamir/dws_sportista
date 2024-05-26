@@ -143,6 +143,27 @@ const Navbar = () => {
               </Link>
             </li>
           )}
+          {userData && userData.role === "manager" && (
+            <li className="py-1 mt-3">
+              <Link to={"/manager"} className="px-4 flex justify-end">
+                <span>Manager Panel</span>
+                <svg
+                  className="w-5 ml-2"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 7.5v9M21 7.5v9M12 2.25v19.5M3 12h18"
+                  />
+                </svg>
+              </Link>
+            </li>
+          )}
         </ul>
       </nav>
     </div>
