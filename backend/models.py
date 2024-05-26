@@ -1,5 +1,6 @@
 from datetime import datetime
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Enum
+from typing import List
 from sqlalchemy.ext.declarative import declarative_base
 from pydantic import BaseModel
 from enum import Enum as PydanticEnum
@@ -134,6 +135,15 @@ class CourtBase(BaseModel):
     city: str
     name: str
     image_link: str
+
+# Pydantic model da vrati teren i njegove sportove, koristi se u API pozivu
+class CourtWithSports(CourtBase):
+    id: int
+    sports: List[str]  # Change from List[int] to List[str]
+
+    class Config:
+        from_attributes = True
+
 
 # SQLAlchemy model za rezervacije
 class Reservation(Base):
