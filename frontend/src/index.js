@@ -9,13 +9,15 @@ import LoginPage from "./pages/LoginPage";
 import ManagerReqPage from "./pages/ManagerReqPage";
 import { AuthProvider } from "./AuthProvider";
 import AdminPage from "./pages/AdminPage";
+import ManagerPage from "./pages/ManagerPage";
 
 const router = createBrowserRouter([
   { path: "/", element: <HomePage /> },
   { path: "/login", element: <LoginPage /> },
   { path: "/signup", element: <SignupPage /> },
   { path: "/postanimenadzer", element: <ManagerReqPage /> },
-  { path: "/admin", element: <AdminPage/>}
+  { path: "/admin", element: <AdminPage/>},
+  { path: "/manager", element: <ManagerPage/>}
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
