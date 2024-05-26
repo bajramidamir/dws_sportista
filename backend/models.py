@@ -64,10 +64,14 @@ class UserCreateRequest(BaseModel):
     role: UserRole = UserRole.user
     preferred_sport: SportsActivity
 
+# Pydantic model za login putem API zahtjeva
+class UserLoginRequest(BaseModel):
+    username: str
+    password: str
+
 # Pydantic model za odgovor sa podacima korisnika
 class UserResponse(UserBase):
     id: int
-
     class Config:
         from_attributes = True
 

@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
+import os
 import jwt
 from jwt import PyJWTError
 from typing import Optional
@@ -10,8 +11,15 @@ from database import SessionLocal, engine
 import models
 from fastapi.middleware.cors import CORSMiddleware
 
-# Import funkcija za autentifikaciju putem JWT
+# dotenv stvari
+from dotenv import load_dotenv
+load_dotenv()
+JWT_SECRET = os.environ.get("JWT_SECRET")
+
+
 from jwt_utils import authenticate_user, create_access_token
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 app = FastAPI()
 
@@ -40,9 +48,9 @@ def get_db():
         db.close()
 
 # Ruta za prijavu (login)
-@app.post("/login")
-async def login_for_access_token(username: str, password: str, db: Session = Depends(get_db)):
-    user = authenticate_user(db, username, password)
+@app.post("/users/login")
+async def login_for_access_token(user: models.UserLoginRequest, db: Session = Depends(get_db)):
+    user = authenticate_user(db, user.username, user.password)
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect username or password")
     access_token = create_access_token({"sub": user.username})
@@ -68,3 +76,24 @@ async def create_user(user: models.UserCreateRequest, db: Session = Depends(get_
     db.refresh(db_user)
     
     return db_user
+
+# Funkcija za vracanje trenutnog korisnika na osnovu pristupnog tokena
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithm="HS256")
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+    except PyJWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+
+    user = db.query(models.User).filter(models.User.username == username).first()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+    return user
+
+# Ruta za validaciju pristupnog tokena
+@app.post("users/me")
+async def read_users_me(current_user: models.User = Depends(get_current_user)):
+    return current_user
