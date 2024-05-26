@@ -1,10 +1,11 @@
 import React, { createContext, useState } from 'react';
+import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [username, setUsername] = useState("");
+    const [userData, setUserData] = useState(null);
 
     const login = async (formData) => {
         try {
@@ -16,8 +17,10 @@ const AuthProvider = ({ children }) => {
                 body: JSON.stringify(formData)
             });
             if (response.ok) {
+                const user = await response.json();
+                const decodedToken = jwtDecode(user.access_token);
                 setIsLoggedIn(true);
-                setUsername(formData.username);
+                setUserData(decodedToken);
                 return true;
             } else {
                 console.log("Login failed");
@@ -27,18 +30,18 @@ const AuthProvider = ({ children }) => {
             console.error(error);
             return false;
         }
-      };
+    };
     
-      const logout = () => {
+    const logout = () => {
         setIsLoggedIn(false);
-        setUsername('');
-      };
+        setUserData(null);
+    };
 
     return(
-        <AuthContext.Provider value={{ isLoggedIn, username, login, logout }}>
+        <AuthContext.Provider value={{ isLoggedIn, userData, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-export { AuthProvider, AuthContext }
+export { AuthProvider, AuthContext };

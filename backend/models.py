@@ -1,8 +1,9 @@
 from datetime import datetime
-from sqlalchemy import Boolean, Column, DateTime, Integer, String, Enum
-from typing import List
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, Enum, ForeignKey, Text
+from sqlalchemy.orm import relationship
+from typing import List, Optional
 from sqlalchemy.ext.declarative import declarative_base
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from enum import Enum as PydanticEnum
 
 Base = declarative_base()
@@ -69,6 +70,34 @@ class UserCreateRequest(BaseModel):
 class UserLoginRequest(BaseModel):
     username: str
     password: str
+
+# SQLAlchemy model za menadzer zahtjev
+class ManagerRequest(Base):
+    __tablename__ = 'manager_requests'
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    request_date = Column(DateTime, default=datetime.now)
+    reason = Column(Text, nullable=False)
+    status = Column(String(20), default='Pending')
+    admin_notes = Column(Text, nullable=True)
+    approval_date = Column(DateTime, nullable=True)
+
+    user = relationship("User")
+
+# Pydantic model za slanje prijave da se postane menadzer
+class ManagerApplicationRequest(BaseModel):
+    user_id: int
+    request_date: datetime = Field(default_factory=datetime.now)
+    reason: str
+    status: Optional[str] = Field(default='Pending')
+    admin_notes: Optional[str] = None
+    approval_date: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
 
 # Pydantic model za odgovor sa podacima korisnika
 class UserResponse(UserBase):
