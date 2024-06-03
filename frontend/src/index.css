@@ -13,3 +13,37 @@
 .btn {
     @apply rounded-full py-2 px-3 uppercase text-xs font-bold cursor-pointer
 }
+.dark-mode #or{
+    /* see the characteristic of navbar, the background and the letters*/
+    
+    background-color:rgba(103, 74, 29, 0.8);
+    color: white;
+}
+.dark-mode #ar{
+    background-color: black;
+    color:white;
+}
+/*ovdje dark mode za ostale komponente*/
+.dark-mode #er{
+    background-color: black; /*mozda slika svemirskih zvijezda?*/
+    color: white;
+}
+.dark-mode #ir{
+    background-color: black;
+    color: white;
+}
+.dark-mode #wheaton{
+    background-color: black;
+    color: white;
+}
+.dark-mode .sheldon{
+    background-color: black;
+}
+.dark-mode #walt{
+    background-color: black;
+    color: white;
+}
+.dark-mode #disney{
+    background-color: darkgrey;
+    color: white;
+}
