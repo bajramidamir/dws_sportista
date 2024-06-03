@@ -3,10 +3,20 @@ import Card from "./Card";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../AuthProvider";
 
+
 function HomeComponent() {
   const { isLoggedIn, logout, userData } = useContext(AuthContext);
   const [latestCourts, setLatestCourts] = useState([]);
   const [allCourts, setAllCourts] = useState([]);
+
+  
+  const handleClick = () => {
+    /* here we alter the colors of navbar and everything else */
+    var element = document.body;
+    element.classList.toggle("dark-mode");
+    console.log('Dark mode toggled');
+  };
+
 
   useEffect(() => {
     const fetchLatestCourts = async () => {
@@ -42,7 +52,7 @@ function HomeComponent() {
   }, []);
 
   return (
-    <main className="px-4 sm:px-16 py-6 bg-gray-100 md:col-span-2">
+    <main className="px-4 sm:px-16 py-6 bg-gray-100 md:col-span-2" id="ar">
       <div className="flex justify-center sm:justify-center md:justify-end">
         {isLoggedIn ? (
           <button
@@ -53,6 +63,13 @@ function HomeComponent() {
           </button>
         ) : (
           <>
+            <Link
+              to={"/home"}
+              className="text-primary ml-2 btn border md:border-2 hover:bg-gray-400 hover:text-white"
+              onClick={handleClick}
+            >
+              Dark Mode
+            </Link>
             <Link
               to={"/login"}
               className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
@@ -134,3 +151,4 @@ function HomeComponent() {
 };
 
 export default HomeComponent;
+
