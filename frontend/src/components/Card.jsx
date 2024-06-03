@@ -1,6 +1,6 @@
 import React from "react";
 
-const Card = ({ name, location, sport, imageLink, courtType }) => {
+const Card = ({ name, location, sport, imageLink, courtType, onClick  }) => {
     return (
         <div className="card">
             <img
