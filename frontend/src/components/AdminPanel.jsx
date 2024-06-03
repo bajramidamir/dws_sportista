@@ -18,12 +18,19 @@ const AdminPanel = () => {
     setPopupOpen(false);
   };
 
+  const handleClick = () => {
+    /* here we alter the colors of navbar and everything else */
+    var element = document.body;
+    element.classList.toggle("dark-mode");
+    console.log('Dark mode toggled');
+  };
+
   return (
-    <main className="px-16 py-6 bg-gray-100 md:col-span-2">
+    <main className="px-16 py-6 bg-gray-100 md:col-span-2" id="wheaton">
       {/* Popup za odjavu */}
       {isPopupOpen && (
         <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center z-50">
-          <div className="bg-white p-8 rounded-lg">
+          <div className="bg-white p-8 rounded-lg" >
             <h2 className="text-lg font-bold mb-4">
               Jeste li sigurni da se želite odjaviti?
             </h2>
@@ -41,6 +48,9 @@ const AdminPanel = () => {
 
       {/* Sign out button */}
       <div className="flex justify-center sm:justify-center md:justify-end">
+        <button onClick={handleClick} className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white">
+          Dark Mode
+        </button>
         <button
           onClick={openPopup}
           className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
@@ -62,21 +72,21 @@ const AdminPanel = () => {
 
         <div className="mt-8 grid lg:grid-cols-3 gap-10">
          
-          <div className="card text-center flex flex-col justify-center items-center">
+          <div className="card text-center flex flex-col justify-center items-center" class="sheldon">
             <h4 className="text-xl font-semibold">Trenutni broj korisnika</h4>
             <div className="m-4">
               <h2 className="text-2xl">120</h2>
             </div>
           </div>
 
-          <div className="card text-center flex flex-col justify-center items-center">
+          <div className="card text-center flex flex-col justify-center items-center" class="sheldon">
             <h4 className="text-xl font-semibold">Trenutni broj terena</h4>
             <div className="m-4">
               <h2 className="text-2xl">120</h2>
             </div>
           </div>
 
-          <div className="card text-center flex flex-col justify-center items-center">
+          <div className="card text-center flex flex-col justify-center items-center" class="sheldon">
             <h4 className="text-xl font-semibold">Trenutni broj menadžera</h4>
             <div className="m-4">
               <h2 className="text-2xl">120</h2>
