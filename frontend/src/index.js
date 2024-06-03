@@ -4,6 +4,7 @@ import "./index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import App from "./App";
 import HomePage from "./pages/HomePage";
+import LandingPage from "./pages/LandingPage";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import ManagerReqPage from "./pages/ManagerReqPage";
@@ -12,7 +13,8 @@ import AdminPage from "./pages/AdminPage";
 import ManagerPage from "./pages/ManagerPage";
 
 const router = createBrowserRouter([
-  { path: "/", element: <HomePage /> },
+  { path: "/", element: <LandingPage />},
+  { path: "/home", element: <HomePage /> },
   { path: "/login", element: <LoginPage /> },
   { path: "/signup", element: <SignupPage /> },
   { path: "/postanimenadzer", element: <ManagerReqPage /> },
