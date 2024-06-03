@@ -30,6 +30,13 @@ function SignupForm() {
     }
   };
 
+  const handleClick = () => {
+    /* here we alter the colors of navbar and everything else */
+    var element = document.body;
+    element.classList.toggle("dark-mode");
+    console.log('Dark mode toggled');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
@@ -61,8 +68,14 @@ function SignupForm() {
   };
 
   return (
-    <div className="px-16 py-6 bg-gray-100 md:col-span-2 min-h-screen flex flex-col">
+    <div className="px-16 py-6 bg-gray-100 md:col-span-2 min-h-screen flex flex-col" id="ir">
       <div className="flex justify-center sm:justify-center md:justify-end">
+        <Link
+              to={"/signup"}
+              className="text-primary ml-2 btn border md:border-2 hover:bg-gray-400 hover:text-white" id="pr"
+              onClick={handleClick}
+            > DARK MODE
+              </Link>
         <Link
           to={"/login"}
           className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
@@ -291,3 +304,4 @@ function SignupForm() {
 }
 
 export default SignupForm;
+
