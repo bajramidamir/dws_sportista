@@ -169,3 +169,81 @@ def get_all_courts(db: Session = Depends(get_db)):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+# Ruta za dodavanje novog terena
+@app.post("/courts/create", status_code=status.HTTP_201_CREATED)
+async def create_court(court: models.CourtCreateRequest, db: Session = Depends(get_db)):
+    try:
+        db_court = models.Court(
+            court_type=court.court_type,
+            city=court.city,
+            name=court.name,
+            image_link=court.image_link
+        )
+
+        db.add(db_court)
+        db.commit()
+        db.refresh(db_court)
+
+        return {"message": "Teren uspješno dodan!"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+# Ruta za brisanje terena
+@app.delete("/courts/delete/{court_id}", status_code=status.HTTP_200_OK)
+async def delete_court(court_id: int, db: Session = Depends(get_db)):
+    try:
+        court = db.query(models.Court).filter(models.Court.id == court_id).first()
+        if court is None:
+            raise HTTPException(status_code=404, detail="Teren nije pronađen")
+
+        db.delete(court)
+        db.commit()
+
+        return {"message": "Teren uspješno obrisan"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+
+# Ruta za dodavanje novog termina
+@app.post("/appointments/create", status_code=status.HTTP_201_CREATED)
+async def create_appointment(appointment: models.AppointmentCreateRequest, db: Session = Depends(get_db)):
+    try:
+        db_appointment = models.Appointment(
+            start_time=appointment.start_time,
+            end_time=appointment.end_time,
+            court_id=appointment.court_id,
+            sport_id=appointment.sport_id,
+            available_slots=appointment.available_slots,
+            cancelled=False
+        )
+
+        db.add(db_appointment)
+        db.commit()
+        db.refresh(db_appointment)
+
+        return {"message": "Termin uspješno dodan!"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+# Ruta za brisanje termina
+@app.delete("/appointments/delete/{appointment_id}", status_code=status.HTTP_200_OK)
+async def delete_appointment(appointment_id: int, db: Session = Depends(get_db)):
+    try:
+        appointment = db.query(models.Appointment).filter(models.Appointment.id == appointment_id).first()
+        if appointment is None:
+            raise HTTPException(status_code=404, detail="Termin nije pronađen")
+
+        db.delete(appointment)
+        db.commit()
+
+        return {"message": "Termin uspješno obrisan"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
