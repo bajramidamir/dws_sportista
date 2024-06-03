@@ -125,6 +125,14 @@ class AppointmentBase(BaseModel):
     available_slots: int
     cancelled: bool
 
+# Pydantic model za kreiranje termina
+class AppointmentCreateRequest(BaseModel):
+    start_time: datetime
+    end_time: datetime
+    court_id: int
+    sport_id: int
+    available_slots: int
+
 # SQLAlchemy model za vlasnike igralista
 class CourtOwner(Base):
     __tablename__ = 'court_owner'
@@ -164,6 +172,16 @@ class CourtBase(BaseModel):
     city: str
     name: str
     image_link: str
+
+# Pydantic model za unos novog terena
+class CourtCreateRequest(BaseModel):
+    court_type: str
+    city: str
+    name: str
+    image_link: str
+
+    class Config:
+        orm_mode = True
 
 # Pydantic model da vrati teren i njegove sportove, koristi se u API pozivu
 class CourtWithSports(CourtBase):
