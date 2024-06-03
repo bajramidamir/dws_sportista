@@ -11,7 +11,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="md:col-span-1 md:flex md:justify-end bg-orange-300">
+    <div className="md:col-span-1 md:flex md:justify-end bg-orange-300" id="or">
       <nav className="text-right">
         <div className="flex justify-end items-center">
           <h1 className="font-bold uppercase p-4 border-b border-gray-100">
