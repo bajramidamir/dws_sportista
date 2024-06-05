@@ -1,6 +1,8 @@
 import React, { useContext, useState, useEffect } from "react";
 import Card from "./Card";
 import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
+
 import { AuthContext } from "../AuthProvider";
 
 function HomeComponent() {
@@ -40,6 +42,8 @@ function HomeComponent() {
     fetchLatestCourts();
     fetchAllCourts();
   }, []);
+
+  
 
   return (
     <main className="px-4 sm:px-16 py-6 bg-gray-100 md:col-span-2">
@@ -81,14 +85,16 @@ function HomeComponent() {
 
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {latestCourts.map((court) => (
-            <Card
-              key={court.id}
-              name={court.name}
-              location={court.city}
-              sport={court.sports.join(", ")}
-              imageLink={court.image_link}
-              courtType={court.court_type}
-            />
+          <Link to={`/reservation/${court.id}`}>
+              <Card
+                key={court.id}
+                name={court.name}
+                location={court.city}
+                sport={court.sports.join(", ")}
+                imageLink={court.image_link}
+                courtType={court.court_type}
+              /> 
+            </Link>
           ))}
         </div>
       </div>
@@ -99,25 +105,30 @@ function HomeComponent() {
       <div className="mt-8 grid lg:grid-cols-3 gap-10">
         {isLoggedIn ? (
           allCourts.map((court) => (
-            <Card
-              key={court.id}
-              name={court.name}
-              location={court.city}
-              sport={court.sports.join(", ")}
-              imageLink={court.image_link}
-              courtType={court.court_type}
-            />
+            <Link to={`/reservation/${court.id}`}>
+              <Card
+                key={court.id}
+                name={court.name}
+                location={court.city}
+                sport={court.sports.join(", ")}
+                imageLink={court.image_link}
+                courtType={court.court_type}
+              />
+              </Link>
           ))
         ) : (
           allCourts.slice(0, 3).map((court) => (
-            <Card
-              key={court.id}
-              name={court.name}
-              location={court.city}
-              sport={court.sports.join(", ")}
-              imageLink={court.image_link}
-              courtType={court.court_type}
-            />
+            <Link to={`/reservation/${court.id}`}>
+
+              <Card
+                key={court.id}
+                name={court.name}
+                location={court.city}
+                sport={court.sports.join(", ")}
+                imageLink={court.image_link}
+                courtType={court.court_type}
+              />
+            </Link>
           ))
         )}
       </div>
