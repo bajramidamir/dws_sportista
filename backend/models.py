@@ -181,7 +181,7 @@ class CourtCreateRequest(BaseModel):
     image_link: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Pydantic model da vrati teren i njegove sportove, koristi se u API pozivu
 class CourtWithSports(CourtBase):
