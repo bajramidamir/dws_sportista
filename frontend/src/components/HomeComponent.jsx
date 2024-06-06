@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import Card from "./Card";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../AuthProvider";
-
+import Chat from "./Chat";
 
 function HomeComponent() {
   const { isLoggedIn, logout, userData } = useContext(AuthContext);
@@ -146,6 +146,7 @@ function HomeComponent() {
           </div>
         </div>
       )}
+      <Chat/>
     </main>
   );
 };
