@@ -22,7 +22,7 @@ function LoginForm() {
             const success = await login(formData);
             if (success) {
                 console.log("Success logging in!");
-                navigate('/');
+                navigate('/home');
             } else {
                 console.log("Login failed.")
             }

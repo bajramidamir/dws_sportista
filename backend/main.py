@@ -171,6 +171,29 @@ def get_all_courts(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
     
 
+# Ruta za dobavljanje specificnog terena
+@app.get("/courts/{court_id}", response_model=models.CourtWithSports)
+def get_court_by_id(court_id: int, db: Session = Depends(get_db)):
+    try:
+        court = db.query(models.Court).filter(models.Court.id == court_id).first()
+        if not court:
+            raise HTTPException(status_code=404, detail="Court not found")
+
+        sports = db.query(models.CourtSport).filter(models.CourtSport.court_id == court.id).all()
+        sport_names = [db.query(models.Sport.name).filter(models.Sport.id == sport.sport_id).first()[0] for sport in sports]
+
+        return models.CourtWithSports(
+            id=court.id,
+            court_type=court.court_type,
+            city=court.city,
+            name=court.name,
+            image_link=court.image_link,
+            sports=sport_names
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Ruta za dodavanje novog terena
 @app.post("/courts/create", status_code=status.HTTP_201_CREATED)
 async def create_court(court: models.CourtCreateRequest, db: Session = Depends(get_db)):
