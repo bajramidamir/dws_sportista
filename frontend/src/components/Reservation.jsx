@@ -4,18 +4,19 @@ import { AuthContext } from "../AuthProvider";
 import Card from "./Card";
 
 function Reservation() {
+    const { courtId } = useParams(); // Ensure this is at the top
+    const [selectedCourt, setSelectedCourt] = useState(null);
+    const [terms, setTerms] = useState([]);
     const [formData, setFormData] = useState({
-    
         start_time: "",
         number_of_players: ""
     });
+    const { isLoggedIn, userData } = useContext(AuthContext);
+    const [selectedTerm, setSelectedTerm] = useState(null);
+    const [idTermina, setIdTermina] = useState("");
+    const [vrijemeTermina, setVrijemeTermina] = useState("");
 
-    const { isLoggedIn, logout, userData } = useContext(AuthContext);
-    const [selectedCourt, setSelectedCourt] = useState(null);
-    const { courtId } = useParams();
-
-    //dohvacanje podataka o kliknutom terenu za karticu
-
+    // Fetch selected court data
     const fetchSelectedCourt = async () => {
         try {
             const response = await fetch(`http://localhost:8000/courts/${courtId}`);
@@ -28,50 +29,10 @@ function Reservation() {
         } catch (error) {
             console.error(error);
         }
-    }
+    };
 
-    useEffect(() => {
-        fetchSelectedCourt();
-    }, [courtId]);
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    }
-
-    
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await fetch(`http://localhost:8000/reservations`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    appointment_id: selectedTerm.id,
-                    user_id: userData.id,
-                    number_of_players: formData.brojIgraca
-                })
-            });
-            if (response.ok) {
-                console.log("Reservation successful");
-                // TO DO
-            } else {
-                console.error("Failed to make reservation");
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-
-    const [selectedTerm, setSelectedTerm] = useState(null); // Čuvanje informacija o odabranom terminu
-    const [terms, setTerms] = useState([]); // Čuvanje informacija o terminima
-    const [idTermina, setIdTermina] = useState(""); // Čuvanje ID-a odabranog termina
-    const [vrijemeTermina, setVrijemeTermina] = useState(""); // Čuvanje vremena odabranog termina
-
-     // Funkcija za dohvaćanje termina za teren ?
-     const fetchTerms = async () => {
+    // Fetch terms for the selected court
+    const fetchTerms = async () => {
         try {
             const response = await fetch(`http://localhost:8000/appointments/${courtId}`);
             if (response.ok) {
@@ -83,51 +44,68 @@ function Reservation() {
         } catch (error) {
             console.error(error);
         }
-    }
+    };
 
-    // Pozivanje funkcije za dohvat termina kad se komponenta mounta
     useEffect(() => {
+        fetchSelectedCourt();
         fetchTerms();
-    }, []);
+    }, [courtId]);
 
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
-    const handleReserveClick = (id,vrijeme) => {
-        setSelectedTerm({courtId});
+    const handleReserveClick = (id, vrijeme) => {
+        setSelectedTerm({ id });
         setIdTermina(id);
         setVrijemeTermina(vrijeme);
-    }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch(`http://localhost:8000/reservations`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    appointment_id: selectedTerm.id,
+                    user_id: userData.id,
+                    number_of_players: formData.number_of_players
+                })
+            });
+            if (response.ok) {
+                console.log("Reservation successful");
+                // TO DO
+            } else {
+                console.error("Failed to make reservation");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen px-16 py-6 bg-gray-100 md:col-span-2">
             <div className="flex justify-center sm:justify-center md:justify-end">
-                <Link to={"/login"} className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white">Login</Link>
+                <Link to="/login" className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white">Login</Link>
                 <Link to="/signup" className="text-primary ml-2 btn border md:border-2 hover:bg-gray-400 hover:text-white">Sign up</Link>
             </div>
             <main className="flex flex-col items-start justify-start flex-2">
                 <h5 className="text-2xl font-semibold mb-6 mt-5 border-b-2">Rezervacija</h5>
                 <div className="mb-10 w-full">
-                     {/*Ova kartica je samo demo, treba je obrisati*/}
-                        <Card
-                          key="1"
-                          name="Example Court"
-                          location="Example City"
-                          sport="Basketball"
-                          imageLink="example_image.jpg"
-                          courtType="Indoor"
-                        />
-                        {/* 
+                    {selectedCourt && (
                         <Card
                             key={selectedCourt.id}
                             name={selectedCourt.name}
-                            location={selectedCourt.location}
-                            sport={selectedCourt.sport}
-                            imageLink={selectedCourt.imageLink}
-                            courtType={selectedCourt.courtType}
+                            location={selectedCourt.city}
+                            sport={selectedCourt.sports.join(", ")}
+                            imageLink={selectedCourt.image_link}
+                            courtType={selectedCourt.court_type}
                         />
-                        */}
-                    
+                    )}
                 </div>
-                {/*DEMO tabele */}
                 <table className="table-auto w-full">
                     <thead>
                         <tr>
@@ -157,65 +135,58 @@ function Reservation() {
                         ))}
                     </tbody>
                 </table>
-
-
-
-             <form className="w-full max-w-lg mt-10">
-                        <div className="mb-4">
-                            <label htmlFor="appointment_id" className="block text-gray-700 text-sm font-bold mb-2">
-                                ID termina
-                            </label>
-                            <input
-                                type="text"
-                                id="appointment_id"
-                                name="appointment_id"
-                                value={formData.appointment_id}
-                                readOnly 
-                                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                placeholder="ID termina"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="start_time" className="block text-gray-700 text-sm font-bold mb-2">
-                               Početak termina
-                            </label>
-                            <input
-                                type="text"
-                                id="start_time"
-                                name="start_time"
-                                value={formData.start_time}
-                                readOnly 
-                                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                placeholder="Vrijeme termina"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label htmlFor="number_of_players" className="block text-gray-700 text-sm font-bold mb-2">
-                                Broj igrača
-                            </label>
-                            <input
-                                type="text"
-                                id="number_of_players"
-                                name="number_of_players"
-                                value={formData.number_of_players}
-                                onChange={handleChange}
-                                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                placeholder="Broj igrača"
-                            />
-                        </div>
-                        <div className="flex justify-center">
-                            <button
-                                type="submit"
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-
+                <form className="w-full max-w-lg mt-10" onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label htmlFor="appointment_id" className="block text-gray-700 text-sm font-bold mb-2">
+                            ID termina
+                        </label>
+                        <input
+                            type="text"
+                            id="appointment_id"
+                            name="appointment_id"
+                            value={selectedTerm ? selectedTerm.id : ""}
+                            readOnly 
+                            className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                            placeholder="ID termina"
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="start_time" className="block text-gray-700 text-sm font-bold mb-2">
+                            Početak termina
+                        </label>
+                        <input
+                            type="text"
+                            id="start_time"
+                            name="start_time"
+                            value={vrijemeTermina}
+                            readOnly 
+                            className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                            placeholder="Vrijeme termina"
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="number_of_players" className="block text-gray-700 text-sm font-bold mb-2">
+                            Broj igrača
+                        </label>
+                        <input
+                            type="text"
+                            id="number_of_players"
+                            name="number_of_players"
+                            value={formData.number_of_players}
+                            onChange={handleChange}
+                            className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                            placeholder="Broj igrača"
+                        />
+                    </div>
+                    <div className="flex justify-center">
+                        <button
+                            type="submit"
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                         >
-                                Potvrdi
-                            </button>
-                        </div>
-                    </form>
-
-        
-
+                            Potvrdi
+                        </button>
+                    </div>
+                </form>
             </main>
         </div>
     );
