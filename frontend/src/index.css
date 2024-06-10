@@ -47,3 +47,7 @@
     background-color: darkgrey;
     color: white;
 }
+.dark-mode #last{
+    background-color: black;
+    color: white;
+}
