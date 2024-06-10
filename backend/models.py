@@ -112,9 +112,11 @@ class Appointment(Base):
     start_time = Column(DateTime)
     end_time = Column(DateTime)
     court_id = Column(Integer, unique=True, index=True)
-    sport_id = Column(Integer, unique=True, index=True)
+    sport_id = Column(Integer, ForeignKey('sports.id'), unique=True, index=True)
     available_slots = Column(Integer)
     cancelled = Column(Boolean)
+
+    sport = relationship("Sport")
 
 # Pydantic model za termine
 class AppointmentBase(BaseModel):
@@ -124,6 +126,19 @@ class AppointmentBase(BaseModel):
     sport_id: int
     available_slots: int
     cancelled: bool
+
+#Pydantic model za dobijanje termina
+class AppointmentResponse(BaseModel):
+    id: int
+    start_time: datetime
+    end_time: datetime
+    court_id: int
+    sport: str
+    available_slots: int
+    cancelled: bool
+
+    class Config:
+        orm_mode = True
 
 # Pydantic model za kreiranje termina
 class AppointmentCreateRequest(BaseModel):
@@ -202,6 +217,12 @@ class Reservation(Base):
 
 # Pydantic model za rezervacije
 class ReservationBase(BaseModel):
+    appointment_id: int
+    user_id: int
+    number_of_players: int
+
+# Pydantic model za kreiranje rezervacije
+class ReservationCreateRequest(BaseModel):
     appointment_id: int
     user_id: int
     number_of_players: int

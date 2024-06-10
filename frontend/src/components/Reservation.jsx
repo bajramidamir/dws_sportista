@@ -64,7 +64,7 @@ function Reservation() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(`http://localhost:8000/reservations`, {
+            const response = await fetch(`http://localhost:8000/reservations/create`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
