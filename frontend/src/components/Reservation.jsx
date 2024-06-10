@@ -89,10 +89,11 @@ function Reservation() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen px-16 py-6 bg-gray-100 md:col-span-2">
             <div className="flex justify-center sm:justify-center md:justify-end">
+                <Link to="/reservation" className="text-primary btn border md:border-2 hover: bg-gray-400 hover:text-white">Dark Mode</Link>
                 <Link to="/login" className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white">Login</Link>
                 <Link to="/signup" className="text-primary ml-2 btn border md:border-2 hover:bg-gray-400 hover:text-white">Sign up</Link>
             </div>
-            <main className="flex flex-col items-start justify-start flex-2">
+            <main className="flex flex-col items-start justify-start flex-2" id="last">
                 <h5 className="text-2xl font-semibold mb-6 mt-5 border-b-2">Rezervacija</h5>
                 <div className="mb-10 w-full">
                     {selectedCourt && (
