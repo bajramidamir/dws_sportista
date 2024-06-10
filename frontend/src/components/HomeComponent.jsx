@@ -2,8 +2,9 @@ import React, { useContext, useState, useEffect } from "react";
 import Card from "./Card";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../AuthProvider";
-import Chat from "./Chat";
+import { useHistory } from "react-router-dom";
 
+import Chat from "./Chat";
 function HomeComponent() {
   const { isLoggedIn, logout, userData } = useContext(AuthContext);
   const [latestCourts, setLatestCourts] = useState([]);
