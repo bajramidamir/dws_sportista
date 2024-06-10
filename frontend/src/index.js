@@ -11,6 +11,7 @@ import ManagerReqPage from "./pages/ManagerReqPage";
 import { AuthProvider } from "./AuthProvider";
 import AdminPage from "./pages/AdminPage";
 import ManagerPage from "./pages/ManagerPage";
+import ReservationPage from "./pages/ReservationPage";
 
 const router = createBrowserRouter([
   { path: "/", element: <LandingPage />},
@@ -19,7 +20,8 @@ const router = createBrowserRouter([
   { path: "/signup", element: <SignupPage /> },
   { path: "/postanimenadzer", element: <ManagerReqPage /> },
   { path: "/admin", element: <AdminPage/>},
-  { path: "/manager", element: <ManagerPage/>}
+  { path: "/manager", element: <ManagerPage/>},
+  { path: "reservation/:courtId", element: <ReservationPage/> },
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
