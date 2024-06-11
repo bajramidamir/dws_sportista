@@ -270,3 +270,47 @@ async def delete_appointment(appointment_id: int, db: Session = Depends(get_db))
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# Ruta za dohvacanje termina za odredjeni teren
+@app.get("/appointments/{court_id}", response_model=List[models.AppointmentResponse])
+def fetch_terms(court_id: int, db: Session = Depends(get_db)):
+    try:
+        appointments = db.query(models.Appointment).join(models.Sport).filter(models.Appointment.court_id == court_id).all()
+        if not appointments:
+            raise HTTPException(status_code=404, detail="Termini nisu pronađeni")
+
+        appointment_responses = [
+            models.AppointmentResponse(
+                id=appointment.id,
+                start_time=appointment.start_time,
+                end_time=appointment.end_time,
+                court_id=appointment.court_id,
+                sport=appointment.sport.name,
+                available_slots=appointment.available_slots,
+                cancelled=appointment.cancelled
+            )
+            for appointment in appointments
+        ]
+        
+        return appointment_responses
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Ruta za dodavanje rezervacija
+@app.post("/reservations/create", status_code=status.HTTP_201_CREATED)
+def create_reservation(reservation: models.ReservationCreateRequest, db: Session = Depends(get_db)):
+    try:
+        new_reservation = models.Reservation(
+            appointment_id=reservation.appointment_id,
+            user_id=reservation.user_id,
+            number_of_players=reservation.number_of_players
+        )
+
+        db.add(new_reservation)
+        db.commit()
+        db.refresh(new_reservation)
+
+        return {"message": "Rezervijacija uspješno dodana!"}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
