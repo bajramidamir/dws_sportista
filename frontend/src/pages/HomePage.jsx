@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import HomeComponent from "../components/HomeComponent";
+import Footer from "../components/Footer";
 
 function HomePage() {
  
@@ -10,6 +11,7 @@ function HomePage() {
           <Navbar />
           <HomeComponent />
         </div>
+        <Footer/>
       </div>
     );
   }

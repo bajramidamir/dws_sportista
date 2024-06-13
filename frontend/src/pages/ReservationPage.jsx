@@ -1,6 +1,7 @@
 import React from "react";
 import Reservation from "../components/Reservation";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 
 function ReservationPage() {
@@ -10,6 +11,7 @@ function ReservationPage() {
           <Navbar />
           <Reservation />
         </div>
+        <Footer/>
       </div>
     )
 

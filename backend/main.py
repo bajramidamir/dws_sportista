@@ -6,7 +6,7 @@ import os
 import jwt
 from jwt import PyJWTError
 from typing import Optional, List
-from sqlalchemy import desc, asc
+from sqlalchemy import and_, desc, asc
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
 import models
@@ -56,6 +56,7 @@ async def login_for_access_token(user: models.UserLoginRequest, db: Session = De
         raise HTTPException(status_code=401, detail="Incorrect username or password")
     access_token = create_access_token({"sub": user.username, "role": user.role, "matches_played": user.matches_played, "id": user.id})
     return {"access_token": access_token, "token_type": "bearer"}
+
 
 
 # Ruta za kreiranje novog korisnika
@@ -124,6 +125,42 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 async def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
 
+
+#dohvacanje info o terenima za tebelu TereniTable
+@app.get("/courts/table")
+def get_courts_and_owners(db: Session = Depends(get_db)):
+    try:
+        courts = db.query(models.Court).all()
+        court_owners = db.query(models.CourtOwner).all()
+
+        court_data = []
+        for court in courts:
+            owner = next((owner for owner in court_owners if owner.court_id == court.id), None)
+            if owner:
+                owner_user = db.query(models.User).filter(models.User.id == owner.user_id).first()
+                court_data.append({
+                    "id": court.id,
+                    "name": court.name,
+                    "owner_first_name": owner_user.first_name,
+                    "owner_last_name": owner_user.last_name,
+                    "court_type": court.court_type
+                })
+            else:
+                  court_data.append({
+                    "id": court.id,
+                    "name": court.name,
+                    "court_type": court.court_type,
+                    "owner_first_name": None,
+                    "owner_last_name": None
+                })
+
+        return court_data
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+
 # Ruta za dobavljanje najnovijih terena
 @app.get("/courts/latest", response_model=List[models.CourtWithSports])
 def get_latest_courts(db: Session = Depends(get_db)):
@@ -167,6 +204,41 @@ def get_all_courts(db: Session = Depends(get_db)):
                 sports=sport_names 
             ))
         return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+#dohvacanje ukupnog broja terena
+@app.get("/courts/count")
+def get_court_count(db: Session = Depends(get_db)):
+    try:
+        court_count = db.query(models.Court).count()
+        return  {"court_number": court_count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# dohvacanje svih menadzera
+@app.get("/users/managers", response_model=List[models.ManagerResponse])
+def get_all_managers(db: Session = Depends(get_db)):
+    try:
+        managers = db.query(models.User).filter(models.User.role == "manager").all()
+        if not managers:
+            raise HTTPException(status_code=404, detail="No managers found")
+
+        # Transformacija rezultata u ManagerResponse objekte
+        managers_response = [
+            models.ManagerResponse(
+                id=manager.id,
+                first_name=manager.first_name,
+                last_name=manager.last_name,
+                email=manager.email
+            )
+            for manager in managers
+        ]
+
+        return managers_response
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
@@ -270,6 +342,129 @@ async def delete_appointment(appointment_id: int, db: Session = Depends(get_db))
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+    
+#dohvacanje ukupnog broja terena
+@app.get("/appointments/count")
+def get_appointment_count(db: Session = Depends(get_db)):
+    try:
+        appointment_count = db.query(models.Appointment).count()
+        return  {"appointment_number": appointment_count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+# Ruta za dobivanje svih termina za fudbal
+@app.get("/appointments/football", response_model=List[models.CourtAppointment])
+def get_football_appointments(db: Session = Depends(get_db)):
+    try:
+        # dohvacanje id-a od football
+        football_sport = db.query(models.Sport).filter(models.Sport.name == "Football").first()
+        if not football_sport:
+            raise HTTPException(status_code=404, detail="Sport 'fudbal' nije pronađen.")
+
+        # dohvacanje svih termina za football
+        football_appointments = db.query(models.Appointment) \
+                                  .filter(and_(models.Appointment.sport_id == football_sport.id,
+                                               models.Appointment.cancelled == False)).all()
+
+        
+        result = []
+        for appointment in football_appointments:
+            court = db.query(models.Court).filter(models.Court.id == appointment.court_id).first()
+            result.append(models.CourtAppointment(
+                id = court.id,
+                name=court.name,
+                location=court.city,
+                sport=football_sport.name,
+                image_link=court.image_link,
+                court_type=court.court_type,
+                start_time=appointment.start_time
+            ))
+        
+        return result
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+# Ruta za dohvatanje svih termina za kosarku
+@app.get("/appointments/basketball", response_model=List[models.CourtAppointment])
+def get_basketball_appointments(db: Session = Depends(get_db)):
+    try:
+        # dohvacanje id-a od kosarke
+        basketball_sport = db.query(models.Sport).filter(models.Sport.name == "Basketball").first()
+        if not basketball_sport:
+            raise HTTPException(status_code=404, detail="Sport 'basketball' nije pronađen.")
+
+        # dohvacnaje svih termina za kosarku
+        basketball_appointments = db.query(models.Appointment) \
+                                  .filter(and_(models.Appointment.sport_id == basketball_sport.id,
+                                               models.Appointment.cancelled == False)) \
+                                  .all()
+
+        result = []
+        for appointment in basketball_appointments:
+            court = db.query(models.Court).filter(models.Court.id == appointment.court_id).first()
+            result.append(models.CourtAppointment(
+                court_id = court.id,
+                court_name=court.name,
+                location=court.city,
+                sport=basketball_sport.name,
+                image_link=court.image_link,
+                court_type=court.court_type,
+                start_time=appointment.start_time
+            ))
+        
+        return result
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+#dohvacanje ukupnog broja korisnika
+@app.get("/users/count")
+def get_user_count(db: Session = Depends(get_db)):
+    try:
+        user_count = db.query(models.User).count()
+        return {"user_number": user_count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+
+
+# dohvacanje svih termina za odbojku
+@app.get("/appointments/volleyball", response_model=List[models.CourtAppointment])
+def get_volleyball_appointments(db: Session = Depends(get_db)):
+    try:
+        # dohvacanje id-a za dobojku
+        volleyball_sport = db.query(models.Sport).filter(models.Sport.name == "Volleyball").first()
+        if not volleyball_sport:
+            raise HTTPException(status_code=404, detail="Sport 'Volleyball' nije pronađen.")
+
+        volleyball_appointments = db.query(models.Appointment) \
+                                  .filter(and_(models.Appointment.sport_id == volleyball_sport.id,
+                                               models.Appointment.cancelled == False)) \
+                                  .all()
+
+        result = []
+        for appointment in volleyball_appointments:
+            court = db.query(models.Court).filter(models.Court.id == appointment.court_id).first()
+            result.append(models.CourtAppointment(
+                court_id = court.id,
+                court_name=court.name,
+                location=court.city,
+                sport=volleyball_sport.name,
+                image_link=court.image_link,
+                court_type=court.court_type,
+                start_time=appointment.start_time
+            ))
+        
+        return result
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # Ruta za dohvacanje termina za odredjeni teren
 @app.get("/appointments/{court_id}", response_model=List[models.AppointmentResponse])
@@ -314,3 +509,4 @@ def create_reservation(reservation: models.ReservationCreateRequest, db: Session
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    

@@ -1,19 +1,21 @@
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
-import AdminPanel from "../components/AdminPanel";
+import LoginForm from "../components/LoginForm";
 import Footer from "../components/Footer";
+import TerminiComponent from "../components/TerminiComponent";
 
-function AdminPage() {
 
+function TerminiPage() {
+ 
     return (
       <div className="text-gray-600 font-mono">
         <div className="grid md:grid-cols-3">
           <Navbar />
-          <AdminPanel/>
+          <TerminiComponent/>
         </div>
         <Footer/>
       </div>
     );
   }
 
-export default AdminPage;
+export default TerminiPage;
