@@ -78,7 +78,7 @@ async def create_user(user: models.UserCreateRequest, db: Session = Depends(get_
     
     return db_user
 
-# main.py route
+# Ruta za slanje prijave za postanak menadzera
 @app.post("/users/manager-application", response_model=models.ManagerApplicationRequest, status_code=status.HTTP_201_CREATED)
 async def create_manager_request(request: models.ManagerApplicationRequest, db: Session = Depends(get_db)):
     # Ensure the user exists
@@ -300,6 +300,19 @@ def fetch_terms(court_id: int, db: Session = Depends(get_db)):
 @app.post("/reservations/create", status_code=status.HTTP_201_CREATED)
 def create_reservation(reservation: models.ReservationCreateRequest, db: Session = Depends(get_db)):
     try:
+        appointment = db.query(models.Appointment).filter(models.Appointment.id == reservation.appointment_id).first()
+        if not appointment:
+            raise HTTPException(status_code=404, detail="Appointment not found")
+        
+        if appointment.available_slots < reservation.number_of_players:
+            raise HTTPException(status_code=400, detail="Not enough available slots")
+        
+        appointment.available_slots -= reservation.number_of_players
+
+        db.add(appointment)
+        db.commit()
+        db.refresh(appointment)
+
         new_reservation = models.Reservation(
             appointment_id=reservation.appointment_id,
             user_id=reservation.user_id,
@@ -314,3 +327,15 @@ def create_reservation(reservation: models.ReservationCreateRequest, db: Session
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+# Ruta za dobavljanje korisnikovih rezervacija
+@app.get("/reservations/user", response_model=List[models.Reservation])
+def get_user_reservations(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    try:
+        reservations = db.query(models.Reservation).filter(models.Reservation.user_id == current_user.id).all()
+        return reservations
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Database error: " + str(e))
+
+
+# Ruta za otkazivanje rezervacija

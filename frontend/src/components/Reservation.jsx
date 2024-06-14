@@ -49,7 +49,7 @@ function Reservation() {
     useEffect(() => {
         fetchSelectedCourt();
         fetchTerms();
-    }, [courtId]);
+    }, [selectedCourt]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -77,7 +77,6 @@ function Reservation() {
             });
             if (response.ok) {
                 console.log("Reservation successful");
-                // TO DO
             } else {
                 console.error("Failed to make reservation");
             }

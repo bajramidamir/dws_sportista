@@ -1,5 +1,5 @@
-import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthProvider";
 
 function ManagerForm() {
@@ -9,9 +9,19 @@ function ManagerForm() {
     request_date: '',
     reason: ''
   });
+  const [submissionStatus, setSubmissionStatus] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (submissionStatus === 'success') {
+      const timer = setTimeout(() => {
+        navigate('/home');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [submissionStatus, navigate]);
 
   const handleChange = (e) => {
-    e.preventDefault();
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -20,7 +30,7 @@ function ManagerForm() {
     e.preventDefault();
     const userPayload = {
       ...formData,
-      request_date: Date.now()
+      request_date: new Date().toISOString()
     };
 
     try {
@@ -31,14 +41,15 @@ function ManagerForm() {
         },
         body: JSON.stringify(userPayload)
       });
-      console.log(userPayload);
+
       if (response.ok) {
-        console.log("Successfully submitted manager application!");
+        setSubmissionStatus('success');
       } else {
-        console.error("Failed to submit manager application!");
+        setSubmissionStatus('error');
       }
     } catch (error) {
       console.error(error);
+      setSubmissionStatus('error');
     }
   };
 
@@ -106,6 +117,16 @@ function ManagerForm() {
             </div>
           </div>
         </form>
+        {submissionStatus === 'success' && (
+          <div className="mt-4 p-4 bg-green-100 text-green-800 rounded">
+            Successfully submitted manager application! Redirecting to home...
+          </div>
+        )}
+        {submissionStatus === 'error' && (
+          <div className="mt-4 p-4 bg-red-100 text-red-800 rounded">
+            Failed to submit manager application. Please try again.
+          </div>
+        )}
       </main>
     </div>
   );

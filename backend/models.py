@@ -138,7 +138,7 @@ class AppointmentResponse(BaseModel):
     cancelled: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Pydantic model za kreiranje termina
 class AppointmentCreateRequest(BaseModel):
