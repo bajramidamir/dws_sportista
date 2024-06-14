@@ -113,7 +113,7 @@ class ManagerResponse(BaseModel):
     email: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # SQLAlchemy model za termine
 class Appointment(Base):

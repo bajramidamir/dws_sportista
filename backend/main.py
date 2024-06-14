@@ -524,10 +524,10 @@ def create_reservation(reservation: models.ReservationCreateRequest, db: Session
         raise HTTPException(status_code=500, detail=str(e))
     
 # Ruta za dobavljanje korisnikovih rezervacija
-@app.get("/reservations/user", response_model=List[models.Reservation])
+@app.get("/reservations/user", response_model=List[models.ReservationBase])
 def get_user_reservations(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     try:
-        reservations = db.query(models.Reservation).filter(models.Reservation.user_id == current_user.id).all()
+        reservations = db.query(models.ReservationBase).filter(models.ReservationBase.user_id == current_user.id).all()
         return reservations
     except Exception as e:
         raise HTTPException(status_code=500, detail="Database error: " + str(e))

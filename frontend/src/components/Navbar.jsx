@@ -64,7 +64,7 @@ const Navbar = () => {
             </Link>
           </li>
           <li className="py-1 mt-3">
-            <Link to={"/user-reservations"} className="px-4 flex justify-end">
+            <Link to={"/userprofilepage"} className="px-4 flex justify-end">
               <span>Termini</span>
               <svg
                 className="w-5 ml-2"

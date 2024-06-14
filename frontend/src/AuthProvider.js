@@ -1,11 +1,21 @@
-import React, { createContext, useState } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import React, { createContext, useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode'; // Correct import
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userData, setUserData] = useState(null);
+
+    useEffect(() => {
+        // Check local storage for token on mount
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            const decodedToken = jwtDecode(token);
+            setIsLoggedIn(true);
+            setUserData({ ...decodedToken, token });
+        }
+    }, []);
 
     const login = async (formData) => {
         try {
@@ -19,8 +29,9 @@ const AuthProvider = ({ children }) => {
             if (response.ok) {
                 const user = await response.json();
                 const decodedToken = jwtDecode(user.access_token);
+                localStorage.setItem('access_token', user.access_token); // Save token in local storage
                 setIsLoggedIn(true);
-                setUserData(decodedToken);
+                setUserData({ ...decodedToken, token: user.access_token });
                 return true;
             } else {
                 console.log("Login failed");
@@ -35,6 +46,7 @@ const AuthProvider = ({ children }) => {
     const logout = () => {
         setIsLoggedIn(false);
         setUserData(null);
+        localStorage.removeItem('access_token');
     };
 
     return(
