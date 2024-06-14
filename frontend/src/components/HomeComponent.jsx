@@ -2,7 +2,6 @@ import React, { useContext, useState, useEffect } from "react";
 import Card from "./Card";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
-
 import { AuthContext } from "../AuthProvider";
 
 function HomeComponent() {
