@@ -3,20 +3,30 @@ import React, { useState, useEffect } from 'react';
 const ManagersTable = () => {
   const [managers, setManagers] = useState([]);
 
-  useEffect(() => {
-  
-    const fetchedManagers = [
-      { id: 1, firstName: 'John', lastName: 'Doe', numberOfFields: 3 },
-      { id: 2, firstName: 'Jane', lastName: 'Smith', numberOfFields: 5 },
-      { id: 3, firstName: 'Mike', lastName: 'Johnson', numberOfFields: 2 },
-    ];
-    setManagers(fetchedManagers);
-  }, []);
+  const fetchManagers = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/users/managers");
+      if (response.ok) {
+        const data = await response.json();
+       setManagers(data); 
+      } else {
+        console.error("Failed to fetch basketball appointments");
+        return []; 
+      }
+    } catch (error) {
+      console.error("Error fetching basketball appointments:", error);
+      return []; 
+    }
+}
 
-  const handleRemove = (id) => {
+  useEffect(() => {
+    fetchManagers();
+  }, []);
+  
+  // const handleRemove = (id) => {
    
-    setManagers(managers.filter(manager => manager.id !== id));
-  };
+  //   setManagers(managers.filter(manager => manager.id !== id));
+  // };
 
   return (
     <div className="overflow-x-auto">
@@ -27,7 +37,7 @@ const ManagersTable = () => {
             <th className="px-4 py-2">ID menadžera</th>
             <th className="px-4 py-2">Ime</th>
             <th className="px-4 py-2">Prezime</th>
-            <th className="px-4 py-2">Broj prijavljenih terena</th>
+            <th className="px-4 py-2">Email</th>
             <th className="px-4 py-2"></th>
           </tr>
         </thead>
@@ -35,13 +45,13 @@ const ManagersTable = () => {
           {managers.map(manager => (
             <tr key={manager.id}>
               <td className="border px-4 py-2">{manager.id}</td>
-              <td className="border px-4 py-2">{manager.firstName}</td>
-              <td className="border px-4 py-2">{manager.lastName}</td>
-              <td className="border px-4 py-2">{manager.numberOfFields}</td>
+              <td className="border px-4 py-2">{manager.first_name}</td>
+              <td className="border px-4 py-2">{manager.last_name}</td>
+              <td className="border px-4 py-2">{manager.email}</td>
               <td className="border px-4 py-2">
                 <button 
                   className="bg-red-500 text-white px-4 py-2 rounded"
-                  onClick={() => handleRemove(manager.id)}
+                 
                 >
                   Ukloni
                 </button>

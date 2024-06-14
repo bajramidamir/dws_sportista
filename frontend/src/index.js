@@ -12,8 +12,8 @@ import { AuthProvider } from "./AuthProvider";
 import AdminPage from "./pages/AdminPage";
 import ManagerPage from "./pages/ManagerPage";
 import ReservationPage from "./pages/ReservationPage";
-import TermsPage from "./pages/TermsPage";
-
+import UserProfilePage from "./pages/UserProfilePage";
+import TerminiPage from "./pages/TerminiPage";
 
 const router = createBrowserRouter([
   { path: "/", element: <LandingPage />},
@@ -24,7 +24,8 @@ const router = createBrowserRouter([
   { path: "/admin", element: <AdminPage/> },
   { path: "/manager", element: <ManagerPage/> },
   { path: "/reservation/:courtId", element: <ReservationPage/> },
-  { path: "/user-reservations", element: <TermsPage /> }
+  { path: "/userprofilepage", element: <UserProfilePage/>},
+  {path: "/termini", element: <TerminiPage/>}
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

@@ -3,18 +3,31 @@ import React, { useState, useEffect } from 'react';
 const TereniTable = () => {
   const [tereni, setTereni] = useState([]);
 
-  useEffect(() => {
-    const fetchedTereni = [
-      { id: 1, naziv: 'Sportski teren 1', imeVlasnika: 'Marko', prezimeVlasnika: 'Marković', tip: 'Otvoreni', },
-      { id: 2, naziv: 'Sportski teren 2', imeVlasnika: 'Ana', prezimeVlasnika: 'Anić', tip: 'Otvoreni', },
-      { id: 3, naziv: 'Sportski teren 3', imeVlasnika: 'Ivan', prezimeVlasnika: 'Ivanić', tip: 'Zatvoreni', },
-    ];
-    setTereni(fetchedTereni);
-  }, []);
+  const fetchTereni = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/courts/table");
+      if (response.ok) {
+        const data = await response.json();
+       setTereni(data); 
+      } else {
+        console.error("Failed to fetch basketball appointments");
+        return []; 
+      }
+    } catch (error) {
+      console.error("Error fetching basketball appointments:", error);
+      return []; 
+    }
+  }
 
   const handleRemove = (id) => {
     setTereni(tereni.filter(teren => teren.id !== id));
   };
+
+  
+  useEffect(() => {
+    fetchTereni();
+  }, []);
+  
 
   return (
     <div className="overflow-x-auto">
@@ -33,14 +46,14 @@ const TereniTable = () => {
           {tereni.map(teren => (
             <tr key={teren.id}>
               <td className="border px-4 py-2">{teren.id}</td>
-              <td className="border px-4 py-2">{teren.naziv}</td>
-              <td className="border px-4 py-2">{teren.imeVlasnika}</td>
-              <td className="border px-4 py-2">{teren.prezimeVlasnika}</td>
-              <td className="border px-4 py-2">{teren.tip}</td>
+              <td className="border px-4 py-2">{teren.name}</td>
+              <td className="border px-4 py-2">{teren.owner_fist_name}</td>
+              <td className="border px-4 py-2">{teren.owner_second_name}</td>
+              <td className="border px-4 py-2">{teren.court_type}</td>
               <td className="border px-4 py-2">
                 <button 
                   className="bg-red-500 text-white px-4 py-2 rounded"
-                  onClick={() => handleRemove(teren.id)}
+           
                 >
                   Otkaži
                 </button>

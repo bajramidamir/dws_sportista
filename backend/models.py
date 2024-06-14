@@ -105,6 +105,16 @@ class UserResponse(UserBase):
     class Config:
         from_attributes = True
 
+#Pydantic model za odg sa podacima o menadzeru
+class ManagerResponse(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+    email: str
+
+    class Config:
+        orm_mode = True
+
 # SQLAlchemy model za termine
 class Appointment(Base):
     __tablename__ = 'appointments'
@@ -236,3 +246,14 @@ class Sport(Base):
 # Pydantic model za rezervacije
 class SportBase(BaseModel):
     name: str
+    
+
+# Pydantic model za termin igrališta
+class CourtAppointment(BaseModel):
+    id: int
+    name: str
+    location: str
+    sport: str
+    image_link: str
+    court_type: str
+    start_time: datetime

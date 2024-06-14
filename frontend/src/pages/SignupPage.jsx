@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import SignupForm from "../components/SignupForm";
+import Footer from "../components/Footer";
 
 
 function SignupPage() {
@@ -11,6 +12,7 @@ function SignupPage() {
           <Navbar />
           <SignupForm/>
         </div>
+        <Footer/>
       </div>
     );
   }

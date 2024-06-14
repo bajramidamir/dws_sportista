@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import ManagerPanel from "../components/ManagerPanel";
+import Footer from "../components/Footer";
 
 function ManagerPage() {
 
@@ -10,6 +11,7 @@ function ManagerPage() {
           <Navbar />
           <ManagerPanel/>
         </div>
+        <Footer/>
       </div>
     );
   }

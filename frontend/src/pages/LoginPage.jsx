@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import LoginForm from "../components/LoginForm";
+import Footer from "../components/Footer";
 
 
 function LoginPage() {
@@ -11,6 +12,7 @@ function LoginPage() {
           <Navbar />
           <LoginForm/>
         </div>
+        <Footer/>
       </div>
     );
   }
