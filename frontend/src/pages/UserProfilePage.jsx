@@ -12,13 +12,15 @@ function UserProfilePage() {
     const fetchUserData = async () => {
       if (contextUserData) {
         try {
-          const response = await fetch(`http://localhost:8000/users/${contextUserData.id}`, {
+          const response = await fetch("http://localhost:8000/users/me", {
             headers: {
               Authorization: `Bearer ${contextUserData.token}`,
             },
+            method: "POST",
           });
           if (response.ok) {
             const data = await response.json();
+            console.log(data)
             setUserData(data);
           } else {
             console.log("Failed to fetch user data");

@@ -104,16 +104,14 @@ async def create_manager_request(request: models.ManagerApplicationRequest, db: 
     return db_request
 
 
-# Funkcija za vracanje trenutnog korisnika na osnovu pristupnog tokena
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithm="HS256")
+        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
         username: str = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     except PyJWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-
 
     user = db.query(models.User).filter(models.User.username == username).first()
     if user is None:
@@ -121,7 +119,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 # Ruta za validaciju pristupnog tokena
-@app.post("/users/me")
+@app.post("/users/me", response_model=models.UserResponse)
 async def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
 
