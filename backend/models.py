@@ -99,11 +99,20 @@ class ManagerApplicationRequest(BaseModel):
 
 
 
-# Pydantic model za odgovor sa podacima korisnika
-class UserResponse(UserBase):
+# Pydantic model za odgovor sa podacima o korisniku
+class UserResponse(BaseModel):
     id: int
+    username: str
+    email: str
+    first_name: str
+    last_name: str
+    city: str
+    fitness_level: Optional[str]
+    preferred_sport: Optional[str]
+    matches_played: Optional[int]
+
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 #Pydantic model za odg sa podacima o menadzeru
 class ManagerResponse(BaseModel):
