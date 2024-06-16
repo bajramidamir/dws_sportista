@@ -5,36 +5,39 @@ import Footer from "../components/Footer";
 import { AuthContext } from "../AuthProvider";
 
 function UserProfilePage() {
-  const [userData, setUserData] = useState(null);
-  const { userData: contextUserData } = useContext(AuthContext);
+  const [userDataState, setUserDataState] = useState(null);
+  const { userData } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (contextUserData) {
+      if (userData) {
         try {
           const response = await fetch("http://localhost:8000/users/me", {
-            headers: {
-              Authorization: `Bearer ${contextUserData.token}`,
-            },
             method: "POST",
+            headers: {
+              Authorization: `Bearer ${userData.token}`,
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include', 
           });
           if (response.ok) {
             const data = await response.json();
-            console.log(data)
-            setUserData(data);
+            console.log(data);
+            setUserDataState(data);
           } else {
-            console.log("Failed to fetch user data");
+            console.log("Failed to fetch user data", response.status);
           }
         } catch (error) {
           console.error("Error fetching user data", error);
         }
       }
     };
+    
 
     fetchUserData();
-  }, [contextUserData]);
+  }, [userData]);
 
-  if (!userData) {
+  if (!userDataState) {
     return <div>Loading...</div>;
   }
 
@@ -43,14 +46,15 @@ function UserProfilePage() {
       <div className="grid md:grid-cols-3">
         <Navbar />
         <UserCard
-          first_name={userData.first_name}
-          last_name={userData.last_name}
-          username={userData.username}
-          email={userData.email}
-          city={userData.city}
-          fitness_level={userData.fitness_level}
-          preferred_sport={userData.preferred_sport}
-          matches_played={userData.matches_played}
+          first_name={userDataState.first_name}
+          last_name={userDataState.last_name}
+          username={userDataState.username}
+          email={userDataState.email}
+          city={userDataState.city}
+          fitness_level={userDataState.fitness_level}
+          preferred_sport={userDataState.preferred_sport}
+          matches_played={userDataState.matches_played}
+          merit={userDataState.merit}
         />
       </div>
       <Footer />

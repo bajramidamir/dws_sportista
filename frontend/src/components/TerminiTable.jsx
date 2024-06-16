@@ -1,59 +1,85 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
-const TerminiTable = () => {
-  const [termini, setTermini] = useState([]);
+const TerminiTable = ({ token }) => {
+  const [reservations, setReservations] = useState([]);
 
   useEffect(() => {
-    const fetchedTermini = [
-      { id: 1, idMenadzera: 101, nazivDvorane: 'Dvorana A', lokacija: 'Sarajevo', datum: '2024-05-27', sport: 'Fudbal', kapacitet: 10 },
-      { id: 2, idMenadzera: 102, nazivDvorane: 'Dvorana B', lokacija: 'Zenica', datum: '2024-06-01', sport: 'Košarka', kapacitet: 15 },
-      { id: 3, idMenadzera: 103, nazivDvorane: 'Dvorana C', lokacija: 'Mostar', datum: '2024-06-05', sport: 'Odbojka', kapacitet: 12 },
-    ];
-    setTermini(fetchedTermini);
-  }, []);
+    const fetchReservations = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/reservations/user", {
+          method: "GET",
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
 
-  const handleRemove = (id) => {
-    setTermini(termini.filter(termin => termin.id !== id));
+        if (response.ok) {
+          const data = await response.json();
+          setReservations(data);
+        } else {
+          console.error('Failed to fetch reservations');
+        }
+      } catch (error) {
+        console.error('Error fetching reservations:', error);
+      }
+    };
+
+    fetchReservations();
+  }, [token]);
+
+  const handleRemove = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8000/reservations/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        setReservations((prevReservations) => prevReservations.filter((reservation) => reservation.id !== id));
+      } else {
+        console.error('Failed to delete the reservation');
+      }
+    } catch (error) {
+      console.error('Error deleting the reservation:', error);
+    }
   };
 
   return (
     <div className="overflow-x-auto">
-    <table className="table-auto w-full">
-      <thead>
-        <tr>
-          <th className="px-4 py-2">ID termina</th>
-          <th className="px-4 py-2">ID menadžera termina</th>
-          <th className="px-4 py-2">Naziv dvorane</th>
-          <th className="px-4 py-2">Lokacija</th>
-          <th className="px-4 py-2">Datum</th>
-          <th className="px-4 py-2">Sport</th>
-          <th className="px-4 py-2">Kapacitet</th>
-          <th className="px-4 py-2"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {termini.map(termin => (
-          <tr key={termin.id}>
-            <td className="border px-4 py-2">{termin.id}</td>
-            <td className="border px-4 py-2">{termin.idMenadzera}</td>
-            <td className="border px-4 py-2">{termin.nazivDvorane}</td>
-            <td className="border px-4 py-2">{termin.lokacija}</td>
-            <td className="border px-4 py-2">{termin.datum}</td>
-            <td className="border px-4 py-2">{termin.sport}</td>
-            <td className="border px-4 py-2">{termin.kapacitet}</td>
-            <td className="border px-4 py-2">
-              <button 
-                className="bg-red-500 text-white px-4 py-2 rounded"
-                onClick={() => handleRemove(termin.id)}
-              >
-                Otkaži
-              </button>
-            </td>
+      <table className="table-auto w-full">
+        <thead>
+          <tr>
+            <th className="px-4 py-2">ID</th>
+            <th className="px-4 py-2">Appointment ID</th>
+            <th className="px-4 py-2">User ID</th>
+            <th className="px-4 py-2">Number of Players</th>
+            <th className="px-4 py-2"></th>
           </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          {reservations.map((reservation) => (
+            <tr key={reservation.id}>
+              <td className="border px-4 py-2">{reservation.id}</td>
+              <td className="border px-4 py-2">{reservation.appointment_id}</td>
+              <td className="border px-4 py-2">{reservation.user_id}</td>
+              <td className="border px-4 py-2">{reservation.number_of_players}</td>
+              <td className="border px-4 py-2">
+                <button
+                  className="bg-red-500 text-white px-4 py-2 rounded"
+                  onClick={() => handleRemove(reservation.id)}
+                >
+                  Cancel
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 

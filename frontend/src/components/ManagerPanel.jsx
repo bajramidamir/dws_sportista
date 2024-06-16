@@ -1,98 +1,111 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../AuthProvider";
 import ManagerCard from "./ManagerCard";
-import TerminiTable from "./TerminiTable";
 import DodajTerenForm from "./DodajTerenForm";
 import DodajTerminForm from "./DodajTerminForm";
 
+const ManagerPanel = () => {
+  const [courtsOwned, setCourtsOwned] = useState([]);
+  const { isLoggedIn, userData, logout } = useContext(AuthContext);
 
-function ManagerPanel() {
-    const [isPopupOpen, setPopupOpen] = useState(false);
-
-    const openPopup = () => {
-        setPopupOpen(true);
+  useEffect(() => {
+    const fetchCourtsOwned = async () => {
+      if (userData) {
+        try {
+          const response = await fetch("http://localhost:8000/courts/manager", {
+            headers: {
+              Authorization: `Bearer ${userData.token}`,
+            },
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setCourtsOwned(data);
+          } else {
+            console.error("Failed to fetch courts owned by manager");
+          }
+        } catch (error) {
+          console.error("Failed to fetch courts owned by manager:", error);
+        }
+      }
     };
 
-    const closePopup = () => {
-        setPopupOpen(false);
-    };
-    return(
-        <main className="px-16 py-6 bg-gray-100 md:col-span-2">
-        {/* Popup za odjavu */}
-        {isPopupOpen && (
-          <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center z-50">
-            <div className="bg-white p-8 rounded-lg">
-              <h2 className="text-lg font-bold mb-4">
-                Jeste li sigurni da se želite odjaviti?
-              </h2>
-              <div className="flex justify-end">
-                <button className="text-primary mr-4" onClick={closePopup}>
-                  Odustani
-                </button>
-                <Link to="/" className="text-red-600 font-bold">
-                  Odjavi se
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-  
-        {/* Sign out button */}
-        <div className="flex justify-center sm:justify-center md:justify-end">
+    fetchCourtsOwned();
+  }, [userData]);
+
+
+  return (
+    <main className="px-16 py-6 bg-gray-100 md:col-span-2">
+      <div className="flex justify-center sm:justify-center md:justify-end">
+        {isLoggedIn ? (
           <button
-            onClick={openPopup}
             className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
+            onClick={logout}
           >
             Sign out
           </button>
-        </div>
-  
-        <header>
-          <h2 className="text-grey-700 text-6xl font-semibold mt-4">
-            Dobrodošao, menadžer!
-          </h2>
-        </header>
+        ) : (
+          <>
+            <Link
+              to="/login"
+              className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
+            >
+              Login
+            </Link>
+            <Link
+              to="/signup"
+              className="text-primary ml-2 btn border md:border-2 hover:bg-gray-400 hover:text-white"
+            >
+              Sign up
+            </Link>
+          </>
+        )}
+      </div>
 
-        
+      <header>
+        <h2 className="text-grey-700 text-6xl font-semibold mt-4">
+          Welcome, Manager!
+        </h2>
+      </header>
+
       <div>
         <h4 className="font-bold mt-12 pb-2 border-b border-color-gray-200">
-          Moji trenutni tereni
+          My Current Courts
         </h4>
 
         <div className="mt-8 grid lg:grid-cols-3 gap-10">
-            <ManagerCard/>
-            <ManagerCard/>
-            <ManagerCard/>
-          
+          {courtsOwned.map((court) => (
+            <ManagerCard
+              key={court.id}
+              name={court.name}
+              location={court.city}
+              sport={court.sports.join(", ")}
+              imageLink={court.image_link}
+              courtType={court.court_type}
+            />
+          ))}
         </div>
       </div>
 
-      <h4 className="mt-12 pb-2 border-b border-color-gray-200 font-bold">
-        Moji trenutni termini
-      </h4>
-      <div className="mt-8">
-        <TerminiTable />
-      </div>
       <div className="flex flex-col items-center mt-12">
-            <h2 className="text-2xl pb-2 border-b border-gray-200 font-bold">
-                Forme
-            </h2>
-            <h3 className="text-xl font-semibold mt-5">Dodaj teren!</h3>
+        <h2 className="text-2xl pb-2 border-b border-gray-200 font-bold">
+          Forms
+        </h2>
 
-            <div className="mt-8 w-full flex justify-center">
-                <DodajTerenForm />
-            </div>
+        <h3 className="text-xl font-semibold mt-5">Add Court</h3>
+        <div className="mt-8 w-full flex justify-center">
+          <DodajTerenForm />
+        </div>
 
-            <h3 className="text-xl font-semibold border-t border-gray-200 mt-6">Dodaj Termin!</h3>
-
-            <div className="mt-8 w-full flex justify-center">
-                <DodajTerminForm />
-            </div>
-       </div>
-
-  
+        <h3 className="text-xl font-semibold border-t border-gray-200 mt-6">
+          Add Appointment
+        </h3>
+        <div className="mt-8 w-full flex justify-center">
+          <DodajTerminForm />
+        </div>
+      </div>
     </main>
-    );
-}
+  );
+};
 
 export default ManagerPanel;

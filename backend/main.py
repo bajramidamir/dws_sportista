@@ -109,8 +109,10 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
         username: str = payload.get("sub")
         if username is None:
+            print("username")
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-    except PyJWTError:
+    except jwt.PyJWTError:
+        print("jwt")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
     user = db.query(models.User).filter(models.User.username == username).first()
@@ -118,11 +120,10 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return user
 
-# Ruta za validaciju pristupnog tokena
+
 @app.post("/users/me", response_model=models.UserResponse)
 async def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
-
 
 #dohvacanje info o terenima za tebelu TereniTable
 @app.get("/courts/table")
@@ -427,9 +428,6 @@ def get_user_count(db: Session = Depends(get_db)):
         return {"user_number": user_count}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
-
-
 
 # dohvacanje svih termina za odbojku
 @app.get("/appointments/volleyball", response_model=List[models.CourtAppointment])
@@ -520,15 +518,46 @@ def create_reservation(reservation: models.ReservationCreateRequest, db: Session
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
-# Ruta za dobavljanje korisnikovih rezervacija
+
+
 @app.get("/reservations/user", response_model=List[models.ReservationBase])
 def get_user_reservations(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     try:
-        reservations = db.query(models.ReservationBase).filter(models.ReservationBase.user_id == current_user.id).all()
+        reservations = db.query(models.Reservation).filter(models.Reservation.user_id == current_user.id).all()
         return reservations
     except Exception as e:
+        print(f"Error fetching reservations for user {current_user.id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Database error: " + str(e))
 
+@app.delete("/reservations/{id}")
+def delete_reservation(id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    reservation = db.query(models.Reservation).filter(models.Reservation.id == id, models.Reservation.user_id == current_user.id).first()
+    if reservation is None:
+        raise HTTPException(status_code=404, detail="Reservation not found")
+    
+    
+    appointment = db.query(models.Appointment).filter(models.Appointment.id == reservation.appointment_id).first()
+    if appointment is None:
+        raise HTTPException(status_code=404, detail="Appointment not found")
+    
+    
+    appointment.available_slots += reservation.number_of_players
+    
+    db.delete(reservation)
+    db.commit()
+    
+    return {"message": "Reservation deleted"}
 
-# Ruta za otkazivanje rezervacija
+
+# Update the route to accept a current_user dependency
+@app.get("/courts/manager", response_model=List[models.CourtBase])
+def get_courts_by_manager(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    try:
+        # Query courts owned by the current user (manager)
+        courts = db.query(models.CourtBase).join(models.CourtOwner).filter(models.CourtOwner.user_id == current_user.id).all()
+        if not courts:
+            raise HTTPException(status_code=404, detail="Courts not found for this manager")
+        return courts
+    except Exception as e:
+        print(f"Error fetching courts for manager {current_user.id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Database error: " + str(e))
