@@ -4,6 +4,17 @@ import jwt
 from typing import Optional
 from sqlalchemy.orm import Session
 import models
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Get the JWT secret from environment variables
+JWT_SECRET = os.getenv("JWT_SECRET")
+
+if not JWT_SECRET:
+    raise Exception("JWT_SECRET not set in environment variables")
 
 # Konfiguracija za enkripciju lozinke
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -25,5 +36,5 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     else:
         expire = datetime.now() + timedelta(minutes=15)  # Token će isteći za 15 minuta
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, "secret_key", algorithm="HS256")
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm="HS256")
     return encoded_jwt

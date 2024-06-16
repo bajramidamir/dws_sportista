@@ -1,13 +1,14 @@
 import React, { useContext, useState, useEffect } from "react";
 import Card from "./Card";
 import { Link } from "react-router-dom";
-import { useHistory } from "react-router-dom";
 import { AuthContext } from "../AuthProvider";
 
 function HomeComponent() {
   const { isLoggedIn, logout, userData } = useContext(AuthContext);
   const [latestCourts, setLatestCourts] = useState([]);
   const [allCourts, setAllCourts] = useState([]);
+
+  console.log(userData);
 
   useEffect(() => {
     const fetchLatestCourts = async () => {
