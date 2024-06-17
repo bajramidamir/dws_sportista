@@ -235,7 +235,7 @@ if (!isLoggedIn) {
       aria-expanded={openSection === 2 ? 'true' : 'false'}
       aria-controls="accordion-collapse-body-2"
     >
-      <span>Dodaj teren</span>
+      <span>Dodaj Teren</span>
       <svg
         data-accordion-icon
         className={`w-3 h-3 rotate-180 shrink-0 ${
