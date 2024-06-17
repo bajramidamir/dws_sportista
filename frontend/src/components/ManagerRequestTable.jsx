@@ -3,23 +3,39 @@ import React, { useState, useEffect } from 'react';
 const ManagerRequestTable = () => {
   const [userFields, setUserFields] = useState([]);
 
+
   useEffect(() => {
-    // cisto radi prikaza ubaceni bezveze podaci
-    const fetchedUserFields = [
-      { id: 1, firstName: 'John', lastName: 'Doe', fieldName: 'Football Field' },
-      { id: 2, firstName: 'Jane', lastName: 'Smith', fieldName: 'Tennis Court' },
-      { id: 3, firstName: 'Mike', lastName: 'Johnson', fieldName: 'Basketball Court' },
-    ];
-    setUserFields(fetchedUserFields);
+    const fetchUserFields = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/manager-applications');
+        if (response.ok) {
+          const data = await response.json();
+          setUserFields(data);
+        } else {
+          console.error('Failed to fetch user fields');
+        }
+      } catch (error) {
+        console.error('Error fetching user fields:', error);
+      }
+    };
+
+    fetchUserFields();
   }, []);
 
-  const handleApprove = (id) => {
-   
+  const handleApprove = async (id) => {
+    // Implement the logic for approving a request here
   };
 
-  const handleReject = (id) => {
-  
+  const handleReject = async (id) => {
+    // Implement the logic for rejecting a request here
   };
+  
+//funkcija za formatiranje datuma
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
 
   return (
     <div className="overflow-x-auto">
@@ -29,7 +45,8 @@ const ManagerRequestTable = () => {
             <th className="px-4 py-2">ID korisnika</th>
             <th className="px-4 py-2">Ime</th>
             <th className="px-4 py-2">Prezime</th>
-            <th className="px-4 py-2">Naziv terena</th>
+            <th className="px-4 py-2">Datum prijave</th>
+            <th className="px-4 py-2">Razlog</th>
             <th className="px-4 py-2"></th>
             <th className="px-4 py-2"></th>
 
@@ -37,23 +54,24 @@ const ManagerRequestTable = () => {
         </thead>
         <tbody>
           {userFields.map(userField => (
-            <tr key={userField.id}>
-              <td className="border px-4 py-2">{userField.id}</td>
-              <td className="border px-4 py-2">{userField.firstName}</td>
-              <td className="border px-4 py-2">{userField.lastName}</td>
-              <td className="border px-4 py-2">{userField.fieldName}</td>
-              <td className="border px-4 py-2">
+             <tr key={userField.user_id}>
+             <td className="border px-4 py-2">{userField.user_id}</td>
+             <td className="border px-4 py-2">{userField.first_name}</td>
+             <td className="border px-4 py-2">{userField.last_name}</td>
+             <td className="border px-4 py-2">{formatDate(userField.request_date)}</td>
+             <td className="border px-4 py-2">{userField.reason}</td>
+             <td className="border px-4 py-2">
                 <button 
                   className="bg-green-500 text-white px-4 py-2 rounded mr-2"
-                  onClick={() => handleApprove(userField.id)}
+                  onClick={() => handleApprove(userField.user_id)}
                 >
-                  Odobri
+                  Prihvati
                 </button>
               </td>
               <td className="border px-4 py-2">
               <button 
                   className="bg-red-500 text-white px-4 py-2 rounded"
-                  onClick={() => handleReject(userField.id)}
+                  onClick={() => handleReject(userField.user_id)}
                 >
                   Odbij
                 </button>

@@ -45,17 +45,17 @@ const TereniTable = () => {
         <tbody>
           {tereni.map(teren => (
             <tr key={teren.id}>
-              <td className="border px-4 py-2">{teren.id}</td>
+                <td className="border px-4 py-2">{teren.id}</td>
               <td className="border px-4 py-2">{teren.name}</td>
-              <td className="border px-4 py-2">{teren.owner_fist_name}</td>
-              <td className="border px-4 py-2">{teren.owner_second_name}</td>
+              <td className="border px-4 py-2">{teren.owner_first_name}</td>
+              <td className="border px-4 py-2">{teren.owner_last_name}</td>
               <td className="border px-4 py-2">{teren.court_type}</td>
               <td className="border px-4 py-2">
                 <button 
                   className="bg-red-500 text-white px-4 py-2 rounded"
            
                 >
-                  Otkaži
+                  Obriši
                 </button>
               </td>
             </tr>

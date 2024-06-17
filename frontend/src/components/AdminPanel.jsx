@@ -1,4 +1,4 @@
-import React, {useEffect, useState } from "react";
+import React, {useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import ManagersTable from "./ManagersTable";
 import ManagerRequestTable from "./ManagerRequestTable";
@@ -6,10 +6,16 @@ import TereniTable from "./TereniTable";
 import DodajTerenForm from "./DodajTerenForm";
 import TerminiTable from "./TerminiTable";
 import DodajTerminForm from "./DodajTerminForm"
+import KorisniciTable from "./KorisniciTable";
+import { AuthContext } from "../AuthProvider";
 
 const AdminPanel = () => {
   const [isPopupOpen, setPopupOpen] = useState(false);
-
+  const [userCount, setUserCount] = useState(0);
+  const [courtCount, setCourtCount] = useState(0);
+  const [appointmentCount, setAppointmentCount] = useState(0);
+  const { isLoggedIn, userData, logout } = useContext(AuthContext);
+ 
   const openPopup = () => {
     setPopupOpen(true);
   };
@@ -18,9 +24,6 @@ const AdminPanel = () => {
     setPopupOpen(false);
   };
 
-  const [userCount, setUserCount] = useState(0);
-  const [courtCount, setCourtCount] = useState(0);
-  const [appointmentCount, setAppointmentCount] = useState(0);
 
 
 
@@ -60,10 +63,10 @@ const fetchAppointmentCount = async () => {
           const data = await response.json();
           setAppointmentCount(data.appointment_number);
       } else {
-          console.error("Failed to fetch user count");
+          console.error("Failed to fetch appointments count");
       }
   } catch (error) {
-      console.error("Error fetching user count:", error);
+      console.error("Error fetching appointments count:", error);
   }
 }
  
@@ -146,6 +149,13 @@ const fetchAppointmentCount = async () => {
       <div className="mt-8">
         <ManagersTable />
       </div>
+      <h4 className="mt-12 pb-2 border-b border-color-gray-200 font-bold">
+        Korisnici
+      </h4>
+      <div className="mt-8">
+        <KorisniciTable />
+      </div>
+
 
       <h4 className="mt-12 pb-2 border-b border-color-gray-200 font-bold">
         Zahtjevi za menadžere
