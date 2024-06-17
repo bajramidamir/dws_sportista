@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 
 const TerminiTable = ({ token }) => {
-  const [reservations, setReservations] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [reservation, setReservations] = useState([]);
+
 
   useEffect(() => {
-    const fetchReservations = async () => {
+    const fetchAppointments = async () => {
       try {
-        const response = await fetch("http://localhost:8000/reservations/user", {
+        const response = await fetch("http://localhost:8000/appointments-all", {
           method: "GET",
           headers: {
             'Content-Type': 'application/json',
@@ -16,7 +18,7 @@ const TerminiTable = ({ token }) => {
 
         if (response.ok) {
           const data = await response.json();
-          setReservations(data);
+          setAppointments(data);
         } else {
           console.error('Failed to fetch reservations');
         }
@@ -25,7 +27,7 @@ const TerminiTable = ({ token }) => {
       }
     };
 
-    fetchReservations();
+    fetchAppointments();
   }, [token]);
 
   const handleRemove = async (id) => {
@@ -47,6 +49,11 @@ const TerminiTable = ({ token }) => {
       console.error('Error deleting the reservation:', error);
     }
   };
+//funkcija za formatiranje datuma
+const formatDate = (dateString) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(dateString).toLocaleDateString(undefined, options);
+};
 
   return (
     <div className="overflow-x-auto">
@@ -54,23 +61,27 @@ const TerminiTable = ({ token }) => {
         <thead>
           <tr>
             <th className="px-4 py-2">ID</th>
-            <th className="px-4 py-2">Appointment ID</th>
-            <th className="px-4 py-2">User ID</th>
-            <th className="px-4 py-2">Number of Players</th>
+            <th className="px-4 py-2"> Pošetak</th>
+            <th className="px-4 py-2">Kraj</th>
+             <th className="px-4 py-2">Sport</th>
+            <th className="px-4 py-2">Broj slobodnih</th>
+
             <th className="px-4 py-2"></th>
           </tr>
         </thead>
         <tbody>
-          {reservations.map((reservation) => (
-            <tr key={reservation.id}>
-              <td className="border px-4 py-2">{reservation.id}</td>
-              <td className="border px-4 py-2">{reservation.appointment_id}</td>
-              <td className="border px-4 py-2">{reservation.user_id}</td>
-              <td className="border px-4 py-2">{reservation.number_of_players}</td>
+          {appointments.map((appointment) => (
+            <tr key={appointment.id}>
+              <td className="border px-4 py-2">{appointment.id}</td>
+              <td className="border px-4 py-2">{appointment.start_time}</td>
+              <td className="border px-4 py-2">{appointment.end_time}</td>
+              <td className="border px-4 py-2">{appointment.sport}</td>
+              <td className="border px-4 py-2">{appointment.available_slots}</td>
+
               <td className="border px-4 py-2">
                 <button
                   className="bg-red-500 text-white px-4 py-2 rounded"
-                  onClick={() => handleRemove(reservation.id)}
+                  onClick={() => handleRemove(appointment.id)}
                 >
                   Cancel
                 </button>

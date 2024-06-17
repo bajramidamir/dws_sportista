@@ -10,9 +10,19 @@ function Reservation() {
   const [formData, setFormData] = useState({
     number_of_players: "",
   });
-  const { userData } = useContext(AuthContext);
+  const { isLoggedIn, logout,userData } = useContext(AuthContext);
   const [selectedTerm, setSelectedTerm] = useState(null);
   const [vrijemeTermina, setVrijemeTermina] = useState("");
+  const [isPopupOpen, setPopupOpen] = useState(false);
+
+  
+  const openPopup = () => {
+    setPopupOpen(true);
+  };
+
+  const closePopup = () => {
+    setPopupOpen(false);
+  };
 
   // Fetch selected court data
   const fetchSelectedCourt = async () => {
@@ -88,21 +98,71 @@ function Reservation() {
     }
   };
 
+  if (!isLoggedIn) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <div className="text-center">
+          <p className="mb-4">You need to be logged in to view this page.</p>
+          <Link to="/login" className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white">
+            Go to Login
+          </Link>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-16 py-6 bg-gray-100 md:col-span-2">
       <div className="flex justify-center sm:justify-center md:justify-end">
-        <Link
-          to="/login"
-          className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
-        >
-          Login
-        </Link>
-        <Link
-          to="/signup"
-          className="text-primary ml-2 btn border md:border-2 hover:bg-gray-400 hover:text-white"
-        >
-          Sign up
-        </Link>
+         {/* Popup za odjavu */}
+         {isPopupOpen && (
+        <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center z-50">
+          <div className="bg-white p-8 rounded-lg">
+            <h2 className="text-lg font-bold mb-4">
+              Jeste li sigurni da se želite odjaviti?
+            </h2>
+            <div className="flex justify-end">
+              <button className="text-primary mr-4" onClick={closePopup}>
+                Odustani
+              </button>
+              <button
+                className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
+                onClick={logout}
+              >
+                 <Link to="/" className="text-red-600 font-bold">
+                Odjavi se
+                </Link>
+          </button>
+             
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="flex justify-center sm:justify-center md:justify-end">
+        {isLoggedIn ? (
+          <button
+            className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
+            onClick={openPopup}
+          >
+            Sign out
+          </button>
+        ) : (
+          <>
+            <Link
+              to="/login"
+              className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
+            >
+              Login
+            </Link>
+            <Link
+              to="/signup"
+              className="text-primary ml-2 btn border md:border-2 hover:bg-gray-400 hover:text-white"
+            >
+              Sign up
+            </Link>
+          </>
+        )}
+      </div>
+
       </div>
       <main className="flex flex-col items-start justify-start flex-2">
         <h5 className="text-2xl font-semibold mb-6 mt-5 border-b-2">

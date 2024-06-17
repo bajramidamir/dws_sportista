@@ -29,8 +29,7 @@ const AdminPanel = () => {
     setPopupOpen(false);
   };
 
-
-
+ 
 
   const fetchUserCount = async () => {
       try {
@@ -81,10 +80,24 @@ const fetchAppointmentCount = async () => {
     fetchAppointmentCount();
 }, []);
 
+if (!isLoggedIn) {
+  return (
+    <div className="flex justify-center items-center h-full">
+      <div className="text-center">
+        <p className="mb-4">You need to be logged in to view this page.</p>
+        <Link to="/login" className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white">
+          Go to Login
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+
   return (
     <main className="px-16 py-6 bg-gray-100 md:col-span-2">
-      {/* Popup za odjavu */}
-      {isPopupOpen && (
+       {/* Popup za odjavu */}
+       {isPopupOpen && (
         <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center z-50">
           <div className="bg-white p-8 rounded-lg">
             <h2 className="text-lg font-bold mb-4">
@@ -94,23 +107,45 @@ const fetchAppointmentCount = async () => {
               <button className="text-primary mr-4" onClick={closePopup}>
                 Odustani
               </button>
-              <Link to="/" className="text-red-600 font-bold">
+              <button
+                className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
+                onClick={logout}
+              >
+                 <Link to="/" className="text-red-600 font-bold">
                 Odjavi se
-              </Link>
+                </Link>
+          </button>
+             
             </div>
           </div>
         </div>
       )}
-
-      {/* Sign out button */}
       <div className="flex justify-center sm:justify-center md:justify-end">
-        <button
-          onClick={openPopup}
-          className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
-        >
-          Sign out
-        </button>
+        {isLoggedIn ? (
+          <button
+            className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
+            onClick={openPopup}
+          >
+            Sign out
+          </button>
+        ) : (
+          <>
+            <Link
+              to="/login"
+              className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
+            >
+              Login
+            </Link>
+            <Link
+              to="/signup"
+              className="text-primary ml-2 btn border md:border-2 hover:bg-gray-400 hover:text-white"
+            >
+              Sign up
+            </Link>
+          </>
+        )}
       </div>
+
 
       <header>
         <h2 className="text-grey-700 text-6xl font-semibold mt-4">

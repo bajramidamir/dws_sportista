@@ -10,6 +10,16 @@ function TerminiComponent() {
   const [footbalTerms, setFootbalTerms] = useState([]);
   const [basketballTerms, setBasketballTerms] = useState([]);
   const [volleyballTerms, setVoleyballTerms] = useState([]);
+  const [isPopupOpen, setPopupOpen] = useState(false);
+
+  const openPopup = () => {
+    setPopupOpen(true);
+  };
+
+  const closePopup = () => {
+    setPopupOpen(false);
+  };
+
 
 
   useEffect(() => {
@@ -69,24 +79,48 @@ function TerminiComponent() {
 
   return (
     <main className="px-4 sm:px-16 py-6 bg-gray-100 md:col-span-2">
+      {/* Popup za odjavu */}
+      {isPopupOpen && (
+        <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 flex justify-center items-center z-50">
+          <div className="bg-white p-8 rounded-lg">
+            <h2 className="text-lg font-bold mb-4">
+              Jeste li sigurni da se želite odjaviti?
+            </h2>
+            <div className="flex justify-end">
+              <button className="text-primary mr-4" onClick={closePopup}>
+                Odustani
+              </button>
+              <button
+                className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
+                onClick={logout}
+              >
+                 <Link to="/" className="text-red-600 font-bold">
+                Odjavi se
+                </Link>
+          </button>
+             
+            </div>
+          </div>
+        </div>
+      )}
       <div className="flex justify-center sm:justify-center md:justify-end">
         {isLoggedIn ? (
           <button
             className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
-            onClick={logout}
+            onClick={openPopup}
           >
             Sign out
           </button>
         ) : (
           <>
             <Link
-              to={"/login"}
+              to="/login"
               className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
             >
               Login
             </Link>
             <Link
-              to={"/signup"}
+              to="/signup"
               className="text-primary ml-2 btn border md:border-2 hover:bg-gray-400 hover:text-white"
             >
               Sign up
