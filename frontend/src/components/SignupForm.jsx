@@ -14,6 +14,8 @@ function SignupForm() {
     fitness_level: "",
     preferred_sport: "",
     role: "user",
+    merit: 3,
+    profile_pic: null
   });
 
   const handleChange = (e) => {
@@ -40,6 +42,7 @@ function SignupForm() {
       ...formData,
       fitness_level: formData.fitness_level.toLowerCase(),
       preferred_sport: formData.preferred_sport.toLowerCase(),
+      profile_pic: formData.profile_pic || null,
     };
     try {
       const response = await fetch("http://localhost:8000/users/create", {
@@ -49,7 +52,6 @@ function SignupForm() {
         },
         body: JSON.stringify(userPayload),
       });
-      console.log(formData);
       if (response.ok) {
         return redirect('/login')
       } else {

@@ -62,25 +62,32 @@ async def login_for_access_token(user: models.UserLoginRequest, db: Session = De
 
 
 
-# Ruta za kreiranje novog korisnika
 @app.post("/users/create")
 async def create_user(user: models.UserCreateRequest, db: Session = Depends(get_db)):
-    # Hashiranje lozinke prije čuvanja u bazi podataka
+    # Log incoming request data
+    print(user.model_dump())
+
+    # Hash the password before saving to the database
     hashed_password = pwd_context.hash(user.password)
     
-    # Zamjena originalne lozinke sa hashiranom verzijom
+    # Replace the original password with the hashed version
     user_data = user.model_dump()
     user_data["password"] = hashed_password
     
-    # Kreiranje novog korisnika sa hashiranom lozinkom
-    db_user = models.User(**user_data)
-    
-    # Čuvanje korisnika u bazi podataka
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    
-    return db_user
+    try:
+        # Create a new user with the hashed password
+        db_user = models.User(**user_data)
+        
+        # Save the user to the database
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        
+        return db_user
+    except Exception as e:
+        # Log any errors that occur
+        print(f"Error creating user: {e}")
+        raise HTTPException(status_code=422, detail=str(e))
 
 # Ruta za slanje prijave za postanak menadzera
 @app.post("/users/manager-application", response_model=models.ManagerApplicationRequest, status_code=status.HTTP_201_CREATED)

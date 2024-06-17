@@ -53,7 +53,7 @@ class User(Base):
     role = Column(String)  # Adjust as needed
     preferred_sport = Column(String)  # Adjust as needed
     merit = Column(Integer, default=3)  
-    profile_pic = Column(String)
+    profile_pic = Column(String, default = None)
 
     # Relationship with courts as owners
     courts_owned = relationship("Court", secondary=court_owner_association, back_populates="managers")
@@ -85,7 +85,7 @@ class UserCreateRequest(BaseModel):
     role: UserRole = UserRole.user
     preferred_sport: SportsActivity
     merit: int
-    profile_pic: str
+    profile_pic: Optional[str] = None
 
 # Pydantic model za login putem API zahtjeva
 class UserLoginRequest(BaseModel):
