@@ -23,13 +23,52 @@ const ManagerRequestTable = () => {
   }, []);
 
   const handleApprove = async (id) => {
-    // Implement the logic for approving a request here
+    console.log(`Clicked approve for user ID ${id}`);
+    try {
+      const response = await fetch(`http://localhost:8000/manager-applications/${id}/approve`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (response.ok) {
+        // Update userFields to reflect the change (optional)
+        const updatedUserFields = userFields.map(user => {
+          if (user.user_id === id) {
+            return { ...user, role: 'manager' };
+          }
+          return user;
+        });
+        setUserFields(updatedUserFields);
+      } else {
+        console.error('Failed to approve application');
+      }
+    } catch (error) {
+      console.error('Error approving application:', error);
+    }
   };
 
   const handleReject = async (id) => {
-    // Implement the logic for rejecting a request here
+    try {
+      const response = await fetch(`http://localhost:8000/manager-applications/${id}/reject`, {
+        method: 'DELETE',  // Use DELETE method to delete the request
+      });
+
+      if (response.ok) {
+        console.log(`Clicked Reject for user ID ${id}`);
+        // Optional: Remove the rejected request from userFields
+        const updatedUserFields = userFields.filter(user => user.user_id !== id);
+        setUserFields(updatedUserFields);
+      } else {
+        console.error('Failed to reject application');
+      }
+    } catch (error) {
+      console.error('Error rejecting application:', error);
+    }
   };
-  
+
 //funkcija za formatiranje datuma
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };

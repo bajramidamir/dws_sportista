@@ -14,6 +14,7 @@ court_owner_association = Table('court_owner_association', Base.metadata,
     Column('user_id', ForeignKey('users.id'), primary_key=True)
 )
 
+
 # Define association table for many-to-many relationship between courts and sports
 court_sport_association = Table('court_sport_association', Base.metadata,
     Column('court_id', ForeignKey('courts.id'), primary_key=True),

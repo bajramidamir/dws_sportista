@@ -15,7 +15,12 @@ const AdminPanel = () => {
   const [courtCount, setCourtCount] = useState(0);
   const [appointmentCount, setAppointmentCount] = useState(0);
   const { isLoggedIn, userData, logout } = useContext(AuthContext);
- 
+  const [openSection, setOpenSection] = useState(null);
+
+  const toggleAccordionSection = (sectionId) => {
+    setOpenSection(openSection === sectionId ? null : sectionId);
+  };
+  
   const openPopup = () => {
     setPopupOpen(true);
   };
@@ -181,17 +186,96 @@ const fetchAppointmentCount = async () => {
       <h2 className="mt-12 text-2xl pb-2 border-b border-color-gray-200 font-bold">
         Forme
       </h2>
-      <h3 className="text-1xl ofnt-semibold">Dodaj teren!</h3>
 
-      <div className="mt-8">
-        <DodajTerenForm />
-      </div>
+      
+      <div id="accordion-collapse" data-accordion="collapse">
+  <h2 id="accordion-collapse-heading-2">
+    <button
+      type="button"
+      onClick={() => toggleAccordionSection(2)}
+      className={`flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 border border-b-0 border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3 ${
+        openSection === 2 ? 'bg-gray-100 dark:bg-gray-800' : ''
+      }`}
+      data-accordion-target="#accordion-collapse-body-2"
+      aria-expanded={openSection === 2 ? 'true' : 'false'}
+      aria-controls="accordion-collapse-body-2"
+    >
+      <span>Dodaj teren</span>
+      <svg
+        data-accordion-icon
+        className={`w-3 h-3 rotate-180 shrink-0 ${
+          openSection === 2 ? 'transform rotate-0' : ''
+        }`}
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 10 6"
+      >
+        <path
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M9 5 5 1 1 5"
+        />
+      </svg>
+    </button>
+  </h2>
+  <div
+    id="accordion-collapse-body-2"
+    className={`p-5 border border-b-0 border-gray-200 dark:border-gray-700 ${
+      openSection === 2 ? 'block' : 'hidden'
+    }`}
+    aria-labelledby="accordion-collapse-heading-2"
+  >
+    <DodajTerenForm />
+  </div>
 
-      <h3 className="text-1xl ofnt-semibold border-t border-color-gray-200 mt-5">Dodaj Termin!</h3>
+  <h2 id="accordion-collapse-heading-3">
+    <button
+      type="button"
+      onClick={() => toggleAccordionSection(3)}
+      className={`flex items-center justify-between w-full p-5 font-medium rtl:text-right text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3 ${
+        openSection === 3 ? 'bg-gray-100 dark:bg-gray-800' : ''
+      }`}
+      data-accordion-target="#accordion-collapse-body-3"
+      aria-expanded={openSection === 3 ? 'true' : 'false'}
+      aria-controls="accordion-collapse-body-3"
+    >
+      <span>Dodaj Termin</span>
+      <svg
+        data-accordion-icon
+        className={`w-3 h-3 rotate-180 shrink-0 ${
+          openSection === 3 ? 'transform rotate-0' : ''
+        }`}
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 10 6"
+      >
+        <path
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M9 5 5 1 1 5"
+        />
+      </svg>
+    </button>
+  </h2>
+  <div
+    id="accordion-collapse-body-3"
+    className={`p-5 border border-t-0 border-gray-200 dark:border-gray-700 ${
+      openSection === 3 ? 'block' : 'hidden'
+    }`}
+    aria-labelledby="accordion-collapse-heading-3"
+  >
+    <DodajTerminForm />
+  </div>
 
-    <div className="mt-8">
-      <DodajTerminForm />
-    </div>
+</div>
+
+     
         
     </main>
   );
