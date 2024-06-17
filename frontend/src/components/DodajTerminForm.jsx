@@ -34,11 +34,11 @@ function DodajTerminForm() {
       });
 
       if (!response.ok) {
-        throw new Error("Something went wrong!");
+        alert("Greška prilikom dodavanja termina! Provjerite unesene podatke!")
       }
 
     } catch (error) {
-      console.error("Error:", error);
+      alert("Greška prilikom dodavanja termina! Provjerite unesene podatke!")
     } 
   };
 
