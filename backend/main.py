@@ -305,6 +305,10 @@ def get_court_by_id(court_id: int, db: Session = Depends(get_db)):
 @app.post("/courts/create", status_code=status.HTTP_201_CREATED)
 async def create_court(court: models.CourtCreateRequest, db: Session = Depends(get_db)):
     try:
+        db_sport = db.query(models.Sport).filter(models.Sport.name == court.sport_type).first()
+        if not db_sport:
+            raise HTTPException(status_code=404, detail="Sport not found")
+
         db_court = models.Court(
             court_type=court.court_type,
             city=court.city,
@@ -316,9 +320,17 @@ async def create_court(court: models.CourtCreateRequest, db: Session = Depends(g
         db.commit()
         db.refresh(db_court)
 
+        db_court_sport = models.CourtSport(
+            court_id=db_court.id,
+            sport_id=db_sport.id
+        )
+        db.add(db_court_sport)
+        db.commit()
+
         return {"message": "Teren uspješno dodan!"}
 
     except Exception as e:
+        db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
     
 
@@ -344,11 +356,20 @@ async def delete_court(court_id: int, db: Session = Depends(get_db)):
 @app.post("/appointments/create", status_code=status.HTTP_201_CREATED)
 async def create_appointment(appointment: models.AppointmentCreateRequest, db: Session = Depends(get_db)):
     try:
+        db_court = db.query(models.Court).filter(models.Court.name == appointment.court_name).first()
+        if not db_court:
+            raise HTTPException(status_code=404, detail="Court not found")
+
+
+        db_sport = db.query(models.Sport).filter(models.Sport.name == appointment.sport).first()
+        if not db_sport:
+            raise HTTPException(status_code=404, detail="Sport not found")
+
         db_appointment = models.Appointment(
             start_time=appointment.start_time,
             end_time=appointment.end_time,
-            court_id=appointment.court_id,
-            sport_id=appointment.sport_id,
+            court_id=db_court.id,
+            sport_id=db_sport.id,
             available_slots=appointment.available_slots,
             cancelled=False
         )

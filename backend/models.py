@@ -207,8 +207,8 @@ class AppointmentResponse(BaseModel):
 class AppointmentCreateRequest(BaseModel):
     start_time: datetime
     end_time: datetime
-    court_id: int
-    sport_id: int
+    court_name: str
+    sport: str
     available_slots: int
 
 # SQLAlchemy model za vlasnike igralista
@@ -260,9 +260,10 @@ class CourtBase(BaseModel):
 
 # Pydantic model za unos novog terena
 class CourtCreateRequest(BaseModel):
-    court_type: str
-    city: str
     name: str
+    city: str
+    court_type: str
+    sport_type: str
     image_link: str
 
     class Config:
