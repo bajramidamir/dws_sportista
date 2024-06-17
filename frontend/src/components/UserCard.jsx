@@ -90,7 +90,7 @@ const UserCard = ({ first_name, last_name, username, email, city, fitness_level,
                         </div>
                     </div>
                     <div className="card text-center flex flex-col justify-center items-center">
-                        <h4 className="text-xl font-semibold">Broj odigrani</h4>
+                        <h4 className="text-xl font-semibold">Broj odigranih</h4>
                         <div className="m-4">
                             <h2 className="text-2xl">{matches_played}</h2>
                         </div>

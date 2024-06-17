@@ -135,6 +135,28 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
+# Pydantic model za termin igrališta
+class CourtAppointment2(BaseModel):
+    id: int
+    name: str
+    location: str
+    sport: str
+    court_type: str
+    start_time: datetime
+    available_slots: int
+
+# Model za dohvacanje podataka o korisnicima (za admin panel)
+class UserResponse2(BaseModel):
+    id: int
+    username: str
+    email: str
+    first_name: str
+    last_name: str
+    merit: int
+
+    class Config:
+        orm_mode = True  
+
 #Pydantic model za odg sa podacima o menadzeru
 class ManagerResponse(BaseModel):
     id: int
@@ -298,3 +320,19 @@ class CourtAppointment(BaseModel):
     image_link: str
     court_type: str
     start_time: datetime
+
+
+# Model za menadžer rezervacije
+class ManagerApplicationResponse(BaseModel):
+    user_id: int
+    first_name: str
+    last_name: str
+    request_date: datetime
+    reason: str
+
+    class Config:
+        orm_mode = True
+
+#model za meritupdate
+class MeritUpdate(BaseModel):
+    merit: int

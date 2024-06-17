@@ -1,3 +1,6 @@
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
@@ -124,6 +127,32 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 @app.post("/users/me", response_model=models.UserResponse)
 async def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
+
+
+@app.get("/users-all", response_model=List[models.UserResponse2])
+def get_all_users(db: Session = Depends(get_db)):
+    try:
+        users = db.query(models.User).all()
+        if not users:
+            raise HTTPException(status_code=404, detail="No users found")
+
+        users_response = [
+            models.UserResponse2(
+                 id=user.id,
+                username=user.username,
+                email=user.email,
+                first_name=user.first_name,
+                last_name=user.last_name,
+                merit=user.merit 
+            )
+            for user in users
+        ]
+
+        return users_response
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 #dohvacanje info o terenima za tebelu TereniTable
 @app.get("/courts/table")
@@ -561,3 +590,88 @@ def get_courts_by_manager(current_user: models.User = Depends(get_current_user),
     except Exception as e:
         print(f"Error fetching courts for manager {current_user.id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Database error: " + str(e))
+
+
+# Ruta za dohvacanje zahtjeva za menadžere
+@app.get("/manager-applications", response_model=List[models.ManagerApplicationResponse])
+def get_manager_applications(db: Session = Depends(get_db)):
+    try:
+        # Query the database for all manager application requests
+        applications = db.query(models.ManagerRequest).all()
+        if not applications:
+            raise HTTPException(status_code=404, detail="No manager applications found")
+
+        response = []
+        for application in applications:
+            # Query the database for the user associated with the application
+            user = db.query(models.User).filter(models.User.id == application.user_id).first()
+            if not user:
+                continue  # Skip this application if the user is not found
+
+            # Append the application details to the response list
+            response.append(
+                models.ManagerApplicationResponse(
+                    user_id=user.id,
+                    first_name=user.first_name,
+                    last_name=user.last_name,
+                    request_date=application.request_date,
+                    reason=application.reason
+                )
+            )
+
+        return response
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+# Ruta za povećanje merit vrijednosti
+@app.put("/usersIM/{user_id}/increase_merit", response_model=models.MeritUpdate)
+def increase_merit(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.merit < 5:
+            user.merit += 1
+            db.commit()
+            db.refresh(user)
+     
+
+    return {"merit": user.merit}
+
+
+# Funkcija za slanje email poruke
+def send_email(subject, body, to_email):
+    from_email = "your-email@example.com"  # Email adresa sa koje se šalje poruka
+    password = "your-email-password"       # Lozinka za email adresu
+
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(body, 'plain'))
+
+    server = smtplib.SMTP('smtp.example.com', 587)  # SMTP server i port (primer)
+    server.starttls()
+    server.login(from_email, password)
+    server.sendmail(from_email, to_email, msg.as_string())
+    server.quit()
+
+# Ruta za smanjenje merit vrijednoti
+@app.put("/usersDM/{user_id}/decrease_merit", response_model=models.MeritUpdate)
+def decrease_merit(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.merit > 1:
+        user.merit -= 1
+        db.commit()
+        db.refresh(user)
+  
+    
+
+    return {"merit": user.merit}
+
