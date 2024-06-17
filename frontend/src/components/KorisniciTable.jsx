@@ -58,6 +58,25 @@ const KorisniciTable = () => {
   };
 
 
+  const deleteUser = async (userId) => {
+    userId = parseInt(userId); 
+    const response = await fetch(`http://localhost:8000/users/${userId}`, {
+      method: 'DELETE'
+    });
+  
+    if (response.ok) {
+      // Ako je brisanje uspješno, ažurirajte stanje korisnika tako da uklonite izbrisani element iz liste korisnika
+      setKorisnici(prevState =>
+        prevState.filter(korisnik => korisnik.id !== userId)
+      );
+      console.log(`User with ID ${userId} successfully deleted.`);
+    } else {
+      console.error("Failed to delete user");
+    }
+  };
+  
+
+
   
   useEffect(() => {
     fetchKorisnici();
@@ -91,10 +110,21 @@ const KorisniciTable = () => {
                         className={`border ${korisnik.merit === 5 ? 'border-gray-400 text-gray-400 cursor-not-allowed' : 'border-green-600 text-green-600'} rounded p-2 mr-2 hover:shadow-md`}>
                           +
                   </button>
-                  <button 
+                  {korisnik.merit === 1 ? (
+                      <button
+                        onClick={() => deleteUser(korisnik.id)}
+                        className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
+                      >
+                        Obriši korisnika
+                      </button>
+                    ) : (
+                      <button
                         onClick={() => decreaseMerit(korisnik.id)}
-                        className="border  border-red-600 rounded p-2 text-red-600 hover:shadow-md">-
-                  </button>
+                        className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
+                      >
+                        -
+                      </button>
+                    )}
               </td>
             </tr>
           ))}

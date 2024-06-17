@@ -682,3 +682,72 @@ def decrease_merit(user_id: int, db: Session = Depends(get_db)):
 
     return {"merit": user.merit}
 
+  
+#Odobravanje zahtjeva za menadžera
+@app.put("/manager-applications/{id}/approve")
+def approve_manager_application(id: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user.role = "manager"
+
+    manager_request = db.query(models.ManagerRequest).filter(models.ManagerRequest.user_id == id).first()
+    if manager_request:
+        db.delete(manager_request)
+
+    db.commit()
+    db.refresh(user)
+
+    return {"message": f"Application with ID {id} approved. Role set to manager"}
+   
+# Odbijanje zahtjeva za menadžera
+@app.delete("/manager-applications/{id}/reject")
+def reject_manager_application(id: int, db: Session = Depends(get_db)):
+    manager_request = db.query(models.ManagerRequest).filter(models.ManagerRequest.user_id == id).first()
+    if not manager_request:
+        raise HTTPException(status_code=404, detail="Manager request not found")
+
+    db.delete(manager_request)
+    db.commit()
+
+
+    return {"message": f"Application with ID {id} rejected. Manager request deleted"}
+
+#Brisanje menadžera i postavljanje na korisnika
+@app.put("/managers/{id}/remove")
+def remove_manager(id: int, db: Session = Depends(get_db)):
+   
+    user = db.query(models.User).filter(models.User.id == id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Provjera je li korisnik zaista menadžer
+    if user.role != "manager":
+        raise HTTPException(status_code=400, detail="User is not a manager")
+
+    # Promjena uloge korisnika na "user"
+    user.role = "user"
+
+    # Brisanje iz tabele menadžera (ako postoji)
+    manager_request = db.query(models.ManagerRequest).filter(models.ManagerRequest.user_id == id).first()
+    if manager_request:
+        db.delete(manager_request)
+
+    db.commit()
+    db.refresh(user)
+
+    return {"message": f"User with ID {id} is no longer a manager"}
+
+
+
+@app.delete("/users/{id}")
+def delete_user(id: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    db.delete(user)
+    db.commit()
+
+    return {"message": f"User with ID {id} has been deleted"}

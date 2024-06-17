@@ -23,10 +23,28 @@ const ManagersTable = () => {
     fetchManagers();
   }, []);
   
-  // const handleRemove = (id) => {
-   
-  //   setManagers(managers.filter(manager => manager.id !== id));
-  // };
+  const handleRemove = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8000/managers/${id}/remove`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (response.ok) {
+        // Update managers state to remove the manager with the given id
+        const updatedManagers = managers.filter(manager => manager.id !== id);
+        setManagers(updatedManagers);
+        console.log(`Removed manager with ID ${id}`);
+      } else {
+        console.error('Failed to remove manager');
+      }
+    } catch (error) {
+      console.error('Error removing manager:', error);
+    }
+  };
 
   return (
     <div className="overflow-x-auto">
@@ -50,7 +68,8 @@ const ManagersTable = () => {
               <td className="border px-4 py-2">{manager.email}</td>
               <td className="border px-4 py-2">
                 <button 
-                  className="bg-red-500 text-white px-4 py-2 rounded"
+                 onClick={() => {handleRemove(manager.id)}}
+                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-400"
                  
                 >
                   Ukloni
