@@ -32,7 +32,7 @@ const TerminiTable = ({ token }) => {
 
   const handleRemove = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8000/reservations/${id}`, {
+      const response = await fetch(`http://localhost:8000/appointments/delete/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ const TerminiTable = ({ token }) => {
       });
 
       if (response.ok) {
-        setReservations((prevReservations) => prevReservations.filter((reservation) => reservation.id !== id));
+        setAppointments((prevReservations) => prevReservations.filter((reservation) => reservation.id !== id));
       } else {
         console.error('Failed to delete the reservation');
       }
