@@ -772,3 +772,29 @@ def delete_user(id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": f"User with ID {id} has been deleted"}
+
+
+# Ruta za dohvacanje termina za odredjeni teren
+@app.get("/appointments-all", response_model=List[models.AppointmentResponse])
+def fetch_terms(db: Session = Depends(get_db)):
+    try:
+        appointments = db.query(models.Appointment).join(models.Sport).filter().all()
+        if not appointments:
+            raise HTTPException(status_code=404, detail="Termini nisu pronađeni")
+
+        appointment_responses = [
+            models.AppointmentResponse(
+                id=appointment.id,
+                start_time=appointment.start_time,
+                end_time=appointment.end_time,
+                court_id=appointment.court_id,
+                sport=appointment.sport.name,
+                available_slots=appointment.available_slots,
+                cancelled=appointment.cancelled
+            )
+            for appointment in appointments
+        ]
+        
+        return appointment_responses
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

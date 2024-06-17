@@ -113,14 +113,14 @@ const KorisniciTable = () => {
                   {korisnik.merit === 1 ? (
                       <button
                         onClick={() => deleteUser(korisnik.id)}
-                        className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
+                        className=" border-red-600 text-red-600 border md:border-2 rounded p-2 mr-2 hover:shadow-md"
                       >
-                        Obriši korisnika
+                        x
                       </button>
                     ) : (
                       <button
                         onClick={() => decreaseMerit(korisnik.id)}
-                        className="text-primary btn border md:border-2 hover:bg-gray-400 hover:text-white"
+                        className="border-red-600 text-red-600 border md:border-2 rounded p-2 mr-2 hover:shadow-md"
                       >
                         -
                       </button>
