@@ -61,11 +61,11 @@ function TerminiComponent() {
             const data = await response.json();
             setVoleyballTerms(data); // Vraćamo podatke ako je zahtjev uspješan
           } else {
-            console.error("Failed to fetch football appointments");
+            console.error("Failed to fetch volleyball appointments");
             return []; // Vraćamo prazan niz ako je došlo do greške
           }
         } catch (error) {
-          console.error("Error fetching football appointments:", error);
+          console.error("Error fetching volleyball appointments:", error);
           return []; // Vraćamo prazan niz ako je došlo do greške
         }
     }
@@ -74,6 +74,18 @@ function TerminiComponent() {
     fetchAllBasketballTerms();
     fetchAllVolleyballTerms();
   }, []);
+
+  const formatDate = (dateString) => {
+    const options = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false 
+    };
+    return new Date(dateString).toLocaleString(undefined, options);
+  };
 
   
 
@@ -149,7 +161,7 @@ function TerminiComponent() {
                         sport={court.sport}
                         imageLink={court.image_link}
                         courtType={court.court_type}
-                        startTime={court.start_time}
+                        startTime={formatDate(court.start_time)}
                     />
                 </Link>
             ))
@@ -164,7 +176,7 @@ function TerminiComponent() {
                   sport={court.sport}
                   imageLink={court.image_link}
                   courtType={court.court_type}
-                  startTime={court.start_time}
+                  startTime={formatDate(court.start_time)}
 
                 />
                 </Link>
@@ -187,7 +199,7 @@ function TerminiComponent() {
                 sport={court.sport}
                 imageLink={court.image_link}
                 courtType={court.court_type}
-                startTime={court.start_time}
+                startTime={formatDate(court.start_time)}
               />
               </Link>
           ))
@@ -202,7 +214,7 @@ function TerminiComponent() {
                  sport={court.sport}
                  imageLink={court.image_link}
                  courtType={court.court_type}
-                 startTime={court.start_time}
+                 startTime={formatDate(court.start_time)}
 
               />
             </Link>
@@ -225,7 +237,7 @@ function TerminiComponent() {
                  sport={court.sport}
                  imageLink={court.image_link}
                  courtType={court.court_type}
-                 startTime={court.start_time}
+                 startTime={formatDate(court.start_time)}
               />
               </Link>
           ))
@@ -240,7 +252,7 @@ function TerminiComponent() {
                 sport={court.sport}
                 imageLink={court.image_link}
                 courtType={court.court_type}
-                startTime={court.start_time}
+                startTime={formatDate(court.start_time)}
 
               />
             </Link>

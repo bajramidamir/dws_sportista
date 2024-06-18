@@ -194,8 +194,6 @@ def get_courts_and_owners(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-
-
 # Ruta za dobavljanje najnovijih terena
 @app.get("/courts/latest", response_model=List[models.CourtWithSports])
 def get_latest_courts(db: Session = Depends(get_db)):
@@ -352,19 +350,20 @@ async def delete_court(court_id: int, db: Session = Depends(get_db)):
     
 
 
-# Ruta za dodavanje novog termina
 @app.post("/appointments/create", status_code=status.HTTP_201_CREATED)
 async def create_appointment(appointment: models.AppointmentCreateRequest, db: Session = Depends(get_db)):
     try:
+        # Query the court based on the provided name
         db_court = db.query(models.Court).filter(models.Court.name == appointment.court_name).first()
         if not db_court:
             raise HTTPException(status_code=404, detail="Court not found")
 
-
+        # Query the sport based on the provided name
         db_sport = db.query(models.Sport).filter(models.Sport.name == appointment.sport).first()
         if not db_sport:
             raise HTTPException(status_code=404, detail="Sport not found")
 
+        # Create the appointment using the retrieved IDs
         db_appointment = models.Appointment(
             start_time=appointment.start_time,
             end_time=appointment.end_time,
@@ -374,6 +373,7 @@ async def create_appointment(appointment: models.AppointmentCreateRequest, db: S
             cancelled=False
         )
 
+        # Add and commit the appointment to the database
         db.add(db_appointment)
         db.commit()
         db.refresh(db_appointment)
@@ -382,6 +382,8 @@ async def create_appointment(appointment: models.AppointmentCreateRequest, db: S
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
     
 # Ruta za brisanje termina
 @app.delete("/appointments/delete/{appointment_id}", status_code=status.HTTP_200_OK)
@@ -444,27 +446,25 @@ def get_football_appointments(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
     
 
-# Ruta za dohvatanje svih termina za kosarku
 @app.get("/appointments/basketball", response_model=List[models.CourtAppointment])
 def get_basketball_appointments(db: Session = Depends(get_db)):
     try:
-        # dohvacanje id-a od kosarke
+        # Fetching basketball sport ID
         basketball_sport = db.query(models.Sport).filter(models.Sport.name == "Basketball").first()
         if not basketball_sport:
-            raise HTTPException(status_code=404, detail="Sport 'basketball' nije pronađen.")
+            raise HTTPException(status_code=404, detail="Sport 'Basketball' nije pronađen.")
 
-        # dohvacnaje svih termina za kosarku
+        # Fetching all basketball appointments
         basketball_appointments = db.query(models.Appointment) \
-                                  .filter(and_(models.Appointment.sport_id == basketball_sport.id,
-                                               models.Appointment.cancelled == False)) \
-                                  .all()
+                                    .filter(and_(models.Appointment.sport_id == basketball_sport.id,
+                                                 models.Appointment.cancelled == False)).all()
 
         result = []
         for appointment in basketball_appointments:
             court = db.query(models.Court).filter(models.Court.id == appointment.court_id).first()
             result.append(models.CourtAppointment(
-                court_id = court.id,
-                court_name=court.name,
+                id=court.id,
+                name=court.name,
                 location=court.city,
                 sport=basketball_sport.name,
                 image_link=court.image_link,
@@ -476,6 +476,7 @@ def get_basketball_appointments(db: Session = Depends(get_db)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
     
 #dohvacanje ukupnog broja korisnika
 @app.get("/users/count")
@@ -490,22 +491,22 @@ def get_user_count(db: Session = Depends(get_db)):
 @app.get("/appointments/volleyball", response_model=List[models.CourtAppointment])
 def get_volleyball_appointments(db: Session = Depends(get_db)):
     try:
-        # dohvacanje id-a za dobojku
+        # Fetching volleyball sport ID
         volleyball_sport = db.query(models.Sport).filter(models.Sport.name == "Volleyball").first()
         if not volleyball_sport:
             raise HTTPException(status_code=404, detail="Sport 'Volleyball' nije pronađen.")
 
+        # Fetching all volleyball appointments
         volleyball_appointments = db.query(models.Appointment) \
-                                  .filter(and_(models.Appointment.sport_id == volleyball_sport.id,
-                                               models.Appointment.cancelled == False)) \
-                                  .all()
+                                    .filter(and_(models.Appointment.sport_id == volleyball_sport.id,
+                                                 models.Appointment.cancelled == False)).all()
 
         result = []
         for appointment in volleyball_appointments:
             court = db.query(models.Court).filter(models.Court.id == appointment.court_id).first()
             result.append(models.CourtAppointment(
-                court_id = court.id,
-                court_name=court.name,
+                id=court.id,
+                name=court.name,
                 location=court.city,
                 sport=volleyball_sport.name,
                 image_link=court.image_link,
@@ -517,6 +518,7 @@ def get_volleyball_appointments(db: Session = Depends(get_db)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 # Ruta za dohvacanje termina za odredjeni teren
@@ -576,12 +578,44 @@ def create_reservation(reservation: models.ReservationCreateRequest, db: Session
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@app.get("/reservations/user", response_model=List[models.ReservationBase])
+@app.get("/reservations/user", response_model=List[models.ReservationWithAppointment])
 def get_user_reservations(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     try:
-        reservations = db.query(models.Reservation).filter(models.Reservation.user_id == current_user.id).all()
-        return reservations
+        reservations = db.query(
+            models.Reservation.id.label('reservation_id'),
+            models.Reservation.appointment_id,
+            models.Reservation.user_id,
+            models.Reservation.number_of_players,
+            models.Appointment.start_time,
+            models.Appointment.end_time,
+            models.Appointment.sport_id,
+            models.Appointment.available_slots,
+            models.Court.name.label('court_name')
+        ).join(
+            models.Appointment, models.Reservation.appointment_id == models.Appointment.id
+        ).join(
+            models.Court, models.Appointment.court_id == models.Court.id
+        ).filter(
+            models.Reservation.user_id == current_user.id
+        ).all()
+
+        if not reservations:
+            print("No reservations found for user")
+
+        for res in reservations:
+            print(f"Reservation: {res}")
+
+        return [models.ReservationWithAppointment(
+            reservation_id=r.reservation_id,
+            appointment_id=r.appointment_id,
+            user_id=r.user_id,
+            number_of_players=r.number_of_players,
+            start_time=r.start_time,
+            end_time=r.end_time,
+            sport=str(r.sport_id),
+            available_slots=r.available_slots,
+            court_name=r.court_name
+        ) for r in reservations]
     except Exception as e:
         print(f"Error fetching reservations for user {current_user.id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Database error: " + str(e))
@@ -604,20 +638,6 @@ def delete_reservation(id: int, db: Session = Depends(get_db), current_user: mod
     db.commit()
     
     return {"message": "Reservation deleted"}
-
-
-# Update the route to accept a current_user dependency
-@app.get("/courts/manager", response_model=List[models.CourtBase])
-def get_courts_by_manager(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    try:
-        # Query courts owned by the current user (manager)
-        courts = db.query(models.CourtBase).join(models.CourtOwner).filter(models.CourtOwner.user_id == current_user.id).all()
-        if not courts:
-            raise HTTPException(status_code=404, detail="Courts not found for this manager")
-        return courts
-    except Exception as e:
-        print(f"Error fetching courts for manager {current_user.id}: {str(e)}")
-        raise HTTPException(status_code=500, detail="Database error: " + str(e))
 
 
 # Ruta za dohvacanje zahtjeva za menadžere

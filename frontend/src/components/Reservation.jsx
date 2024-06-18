@@ -59,7 +59,13 @@ function Reservation() {
   useEffect(() => {
     fetchSelectedCourt();
     fetchTerms();
-  }, [courtId]); // Only run when courtId changes
+  }, [courtId]); // Run whenever courtId changes
+  
+  useEffect(() => {
+    if (selectedTerm) {
+      fetchTerms(); // Refetch terms after a reservation
+    }
+  }, [selectedTerm]); // Run whenever selectedTerm changes
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -96,6 +102,18 @@ function Reservation() {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const formatDate = (dateString) => {
+    const options = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false 
+    };
+    return new Date(dateString).toLocaleString(undefined, options);
   };
 
   if (!isLoggedIn) {
@@ -195,8 +213,8 @@ function Reservation() {
             {terms.map((term) => (
               <tr key={term.id}>
                 <td className="border px-4 py-2">{term.id}</td>
-                <td className="border px-4 py-2">{term.start_time}</td>
-                <td className="border px-4 py-2">{term.end_time}</td>
+                <td className="border px-4 py-2">{formatDate(term.start_time)}</td>
+                <td className="border px-4 py-2">{formatDate(term.end_time)}</td>
                 <td className="border px-4 py-2">{term.sport}</td>
                 <td className="border px-4 py-2">{term.available_slots}</td>
                 <td className="border px-4 py-2">

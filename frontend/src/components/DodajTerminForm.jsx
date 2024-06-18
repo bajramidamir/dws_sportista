@@ -1,13 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function DodajTerminForm() {
   const [formData, setFormData] = useState({
     start_time: "",
     end_time: "",
-    court_name: "",
+    court_name: "", // Changed from court_name to court_id
     sport: "",
     available_slots: "",
   });
+
+  const [courts, setCourts] = useState([]); // State to hold the list of courts
+
+  useEffect(() => {
+    // Fetch list of courts when component mounts
+    fetchCourts();
+  }, []);
+
+  const fetchCourts = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/courts/all");
+      if (response.ok) {
+        const data = await response.json();
+        setCourts(data);
+      } else {
+        console.error("Failed to fetch courts");
+      }
+    } catch (error) {
+      console.error("Error fetching courts:", error);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,9 +40,9 @@ function DodajTerminForm() {
     const courtData = {
       start_time: formData.start_time,
       end_time: formData.end_time,
-      court_name: formData.court_name,
+      court_name: formData.court_name, // Changed from court_name to court_name
       sport: formData.sport,
-      available_slots: formData.available_slots
+      available_slots: formData.available_slots,
     };
 
     try {
@@ -34,12 +55,11 @@ function DodajTerminForm() {
       });
 
       if (!response.ok) {
-        alert("Greška prilikom dodavanja termina! Provjerite unesene podatke!")
+        alert("Greška prilikom dodavanja termina! Provjerite unesene podatke!");
       }
-
     } catch (error) {
-      alert("Greška prilikom dodavanja termina! Provjerite unesene podatke!")
-    } 
+      alert("Greška prilikom dodavanja termina! Provjerite unesene podatke!");
+    }
   };
 
   return (
@@ -63,7 +83,6 @@ function DodajTerminForm() {
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
               />
             </div>
-
             <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
@@ -85,23 +104,27 @@ function DodajTerminForm() {
             <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
               <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                htmlFor="court_name"
+                htmlFor="court_name" // Changed from court_name to court_name
               >
                 Naziv dvorane
               </label>
-              <input
-                type="text"
-                id="court_name"
-                name="court_name"
-                value={formData.court_name}
+              <select
+                id="court_name" // Changed from court_name to court_name
+                name="court_name" // Changed from court_name to court_name
+                value={formData.court_name} // Changed from court_name to court_name
                 onChange={handleChange}
                 className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                placeholder="Naziv dvorane"
-              />
+              >
+                <option value="">Odaberite dvoranu</option>
+                {courts.map((court) => (
+                  <option key={court.id} value={court.name}>
+                    {court.name}
+                  </option>
+                ))}
+              </select>
             </div>
-
             <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
-              <label
+            <label
                 className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                 htmlFor="sport"
               >
@@ -155,3 +178,4 @@ function DodajTerminForm() {
 }
 
 export default DodajTerminForm;
+

@@ -16,7 +16,7 @@ const Footer = () => {
                     target="_blank"
                     type="button"
                     className="rounded-full bg-transparent p-3 font-medium uppercase leading-normal text-surface transition duration-150 ease-in-out hover:bg-orange-200 focus:outline-none focus:ring-0 dark:text-white dark:hover:bg-secondary-900"
-                    data-twe-ripple-init>
+                    data-twe-ripple-init rel="noreferrer">
                     <span className="[&>svg]:h-5 [&>svg]:w-5">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -33,7 +33,7 @@ const Footer = () => {
                     target="_blank"
                     type="button"
                     className="rounded-full bg-transparent p-3 font-medium uppercase leading-normal text-surface transition duration-150 ease-in-out hover:bg-orange-200 focus:outline-none focus:ring-0 dark:text-white dark:hover:bg-secondary-900"
-                    data-twe-ripple-init>
+                    data-twe-ripple-init rel="noreferrer">
                     <span className="mx-auto [&>svg]:h-5 [&>svg]:w-5">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -50,7 +50,7 @@ const Footer = () => {
                     target="_blank"
                     type="button"
                     className="rounded-full bg-transparent p-3 font-medium uppercase leading-normal text-surface transition duration-150 ease-in-out hover:bg-orange-200 focus:outline-none focus:ring-0 dark:text-white dark:hover:bg-secondary-900"
-                    data-twe-ripple-init>
+                    data-twe-ripple-init rel="noreferrer">
                     <span className="mx-auto [&>svg]:h-5 [&>svg]:w-5">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -67,7 +67,7 @@ const Footer = () => {
                     target="_blank"
                     type="button"
                     className="rounded-full bg-transparent p-3 font-medium uppercase leading-normal text-surface transition duration-150 ease-in-out hover:bg-orange-200 focus:outline-none focus:ring-0 dark:text-white dark:hover:bg-secondary-900"
-                    data-twe-ripple-init>
+                    data-twe-ripple-init rel="noreferrer">
                     <span className="mx-auto [&>svg]:h-5 [&>svg]:w-5">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -84,7 +84,7 @@ const Footer = () => {
                     target="_blank"
                     type="button"
                     className="rounded-full bg-transparent p-3 font-medium uppercase leading-normal text-surface transition duration-150 ease-in-out hover:bg-orange-200 focus:outline-none focus:ring-0 dark:text-white dark:hover:bg-secondary-900"
-                    data-twe-ripple-init>
+                    data-twe-ripple-init rel="noreferrer">
                     <span className="mx-auto [&>svg]:h-5 [&>svg]:w-5">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"

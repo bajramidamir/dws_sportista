@@ -14,25 +14,24 @@ court_owner_association = Table('court_owner_association', Base.metadata,
     Column('user_id', ForeignKey('users.id'), primary_key=True)
 )
 
-
 # Define association table for many-to-many relationship between courts and sports
 court_sport_association = Table('court_sport_association', Base.metadata,
     Column('court_id', ForeignKey('courts.id'), primary_key=True),
     Column('sport_id', ForeignKey('sports.id'), primary_key=True)
 )
 
-# Enum za nivo spremnosti
+# Enum for fitness level
 class FitnessLevel(str, PydanticEnum):
     amateur = 'amateur'
     professional = 'professional'
 
-# Enum za uloge
+# Enum for user roles
 class UserRole(str, PydanticEnum):
     user = 'user'
     admin = 'admin'
     manager = 'manager'
 
-# Enum za sportske aktivnosti
+# Enum for sports activities
 class SportsActivity(str, PydanticEnum):
     football = 'football'
     basketball = 'basketball'
@@ -53,13 +52,13 @@ class User(Base):
     matches_played = Column(Integer, default=0)
     role = Column(String)  # Adjust as needed
     preferred_sport = Column(String)  # Adjust as needed
-    merit = Column(Integer, default=3)  
-    profile_pic = Column(String, default = None)
+    merit = Column(Integer, default=3)
+    profile_pic = Column(String, default=None)
 
     # Relationship with courts as owners
     courts_owned = relationship("Court", secondary=court_owner_association, back_populates="managers")
 
-# Pydantic model za korisnika
+# Pydantic model for user base
 class UserBase(BaseModel):
     first_name: str
     last_name: str
@@ -74,7 +73,7 @@ class UserBase(BaseModel):
     merit: int
     profile_pic: str
 
-# Pydantic model za podatke o korisniku koji se šalju putem API zahtjeva
+# Pydantic model for user creation request
 class UserCreateRequest(BaseModel):
     first_name: str
     last_name: str
@@ -88,12 +87,12 @@ class UserCreateRequest(BaseModel):
     merit: int
     profile_pic: Optional[str] = None
 
-# Pydantic model za login putem API zahtjeva
+# Pydantic model for user login request
 class UserLoginRequest(BaseModel):
     username: str
     password: str
 
-# SQLAlchemy model za menadzer zahtjev
+# SQLAlchemy model for manager requests
 class ManagerRequest(Base):
     __tablename__ = 'manager_requests'
 
@@ -107,7 +106,7 @@ class ManagerRequest(Base):
 
     user = relationship("User")
 
-# Pydantic model za slanje prijave da se postane menadzer
+# Pydantic model for manager application request
 class ManagerApplicationRequest(BaseModel):
     user_id: int
     request_date: datetime = Field(default_factory=datetime.now)
@@ -119,7 +118,7 @@ class ManagerApplicationRequest(BaseModel):
     class Config:
         from_attributes = True
 
-# Pydantic model za odgovor sa podacima o korisniku
+# Pydantic model for user response
 class UserResponse(BaseModel):
     id: int
     username: str
@@ -136,7 +135,7 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
-# Pydantic model za termin igrališta
+# Pydantic model for court appointment
 class CourtAppointment2(BaseModel):
     id: int
     name: str
@@ -146,7 +145,7 @@ class CourtAppointment2(BaseModel):
     start_time: datetime
     available_slots: int
 
-# Model za dohvacanje podataka o korisnicima (za admin panel)
+# Model for fetching user data (for admin panel)
 class UserResponse2(BaseModel):
     id: int
     username: str
@@ -156,9 +155,9 @@ class UserResponse2(BaseModel):
     merit: int
 
     class Config:
-        orm_mode = True  
+        from_attributes = True
 
-#Pydantic model za odg sa podacima o menadzeru
+# Pydantic model for manager response
 class ManagerResponse(BaseModel):
     id: int
     first_name: str
@@ -168,20 +167,22 @@ class ManagerResponse(BaseModel):
     class Config:
         from_attributes = True
 
-# SQLAlchemy model za termine
+# SQLAlchemy model for appointments
 class Appointment(Base):
     __tablename__ = 'appointments'
     id = Column(Integer, primary_key=True, index=True)
     start_time = Column(DateTime)
     end_time = Column(DateTime)
-    court_id = Column(Integer, unique=True, index=True)
-    sport_id = Column(Integer, ForeignKey('sports.id'), unique=True, index=True)
+    court_id = Column(Integer, ForeignKey('courts.id'))
+    sport_id = Column(Integer, ForeignKey('sports.id'))
     available_slots = Column(Integer)
     cancelled = Column(Boolean)
 
     sport = relationship("Sport")
+    court = relationship("Court")
+    reservations = relationship("Reservation", back_populates="appointment")
 
-# Pydantic model za termine
+# Pydantic model for appointments
 class AppointmentBase(BaseModel):
     start_time: datetime
     end_time: datetime
@@ -190,7 +191,7 @@ class AppointmentBase(BaseModel):
     available_slots: int
     cancelled: bool
 
-#Pydantic model za dobijanje termina
+# Pydantic model for appointment response
 class AppointmentResponse(BaseModel):
     id: int
     start_time: datetime
@@ -203,7 +204,20 @@ class AppointmentResponse(BaseModel):
     class Config:
         from_attributes = True
 
-# Pydantic model za kreiranje termina
+class ReservationWithAppointment(BaseModel):
+    reservation_id: int
+    appointment_id: int
+    user_id: int
+    number_of_players: int
+    start_time: datetime
+    end_time: datetime
+    court_name: str
+    sport: str  # Ensure that this matches the attribute name in the query
+
+    class Config:
+        from_attributes = True
+
+# Pydantic model for appointment creation request
 class AppointmentCreateRequest(BaseModel):
     start_time: datetime
     end_time: datetime
@@ -211,26 +225,26 @@ class AppointmentCreateRequest(BaseModel):
     sport: str
     available_slots: int
 
-# SQLAlchemy model za vlasnike igralista
+# SQLAlchemy model for court owners
 class CourtOwner(Base):
     __tablename__ = 'court_owner'
     id = Column(Integer, primary_key=True, index=True)
-    court_id = Column(Integer, unique=True, index=True)
-    user_id = Column(Integer, unique=True, index=True)
+    court_id = Column(Integer, ForeignKey('courts.id'))
+    user_id = Column(Integer, ForeignKey('users.id'))
 
 # Pydantic model for court owners
 class CourtOwnerBase(BaseModel):
     court_id: int
     user_id: int
 
-# SQLAlchemy model za sport igralista
+# SQLAlchemy model for court sports
 class CourtSport(Base):
     __tablename__ = 'court_sport'
     id = Column(Integer, primary_key=True, index=True)
-    court_id = Column(Integer, unique=True, index=True)
-    sport_id = Column(Integer, unique=True, index=True)
+    court_id = Column(Integer, ForeignKey('courts.id'))
+    sport_id = Column(Integer, ForeignKey('sports.id'))
 
-# Pydantic model za sport igralista
+# Pydantic model for court sports
 class CourtSportBase(BaseModel):
     court_id: int
     sport_id: int
@@ -250,15 +264,14 @@ class Court(Base):
     # Relationship with sports
     sports = relationship("Sport", secondary=court_sport_association, back_populates="courts")
 
-
-# Pydantic model za igralista
+# Pydantic model for courts
 class CourtBase(BaseModel):
     court_type: str
     city: str
     name: str
     image_link: str
 
-# Pydantic model za unos novog terena
+# Pydantic model for creating a new court
 class CourtCreateRequest(BaseModel):
     name: str
     city: str
@@ -269,15 +282,15 @@ class CourtCreateRequest(BaseModel):
     class Config:
         from_attributes = True
 
-# Pydantic model da vrati teren i njegove sportove, koristi se u API pozivu
+# Pydantic model to return court and its sports, used in API response
 class CourtWithSports(CourtBase):
     id: int
-    sports: List[str] 
+    sports: List[str]
 
     class Config:
         from_attributes = True
 
-# Pydantic model za kreiranje rezervacije
+# Pydantic model for creating a reservation
 class ReservationCreateRequest(BaseModel):
     appointment_id: int
     user_id: int
@@ -295,15 +308,20 @@ class Sport(Base):
 # Pydantic model for sports
 class SportBase(BaseModel):
     name: str
-# SQLAlchemy model za rezervacije
+
+# SQLAlchemy model for reservations
 class Reservation(Base):
     __tablename__ = 'reservations'
     id = Column(Integer, primary_key=True, index=True)
-    appointment_id = Column(Integer, unique=True, index=True)
-    user_id = Column(Integer, index=True)
+    appointment_id = Column(Integer, ForeignKey('appointments.id'))
+    user_id = Column(Integer, ForeignKey('users.id'))
     number_of_players = Column(Integer)
 
-# Pydantic model za rezervacije
+    appointment = relationship("Appointment", back_populates="reservations")
+    user = relationship("User")
+
+
+# Pydantic model for reservations
 class ReservationBase(BaseModel):
     id: int
     appointment_id: int
@@ -313,7 +331,7 @@ class ReservationBase(BaseModel):
     class Config:
         from_attributes = True
 
-# Pydantic model za termin igrališta
+# Pydantic model for court appointment
 class CourtAppointment(BaseModel):
     id: int
     name: str
@@ -323,8 +341,7 @@ class CourtAppointment(BaseModel):
     court_type: str
     start_time: datetime
 
-
-# Model za menadžer rezervacije
+# Model for manager reservation response
 class ManagerApplicationResponse(BaseModel):
     user_id: int
     first_name: str
@@ -333,8 +350,8 @@ class ManagerApplicationResponse(BaseModel):
     reason: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
-#model za meritupdate
+# Model for merit update
 class MeritUpdate(BaseModel):
     merit: int

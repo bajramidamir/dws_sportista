@@ -19,7 +19,7 @@ const TereniTable = () => {
     }
   }
 
-  const handleRemove = (id) => {
+  const handleRemove = async (id) => {
     setTereni(tereni.filter(teren => teren.id !== id));
   };
 
@@ -51,12 +51,6 @@ const TereniTable = () => {
               <td className="border px-4 py-2">{teren.owner_last_name}</td>
               <td className="border px-4 py-2">{teren.court_type}</td>
               <td className="border px-4 py-2">
-                <button 
-                  className="bg-red-500 text-white px-4 py-2 rounded"
-           
-                >
-                  Obriši
-                </button>
               </td>
             </tr>
           ))}
